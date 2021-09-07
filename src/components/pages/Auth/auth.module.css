@@ -1,0 +1,16 @@
+.root__input{
+    margin: 5px 0px;
+}
+.root__button{
+    margin-top: 15px;
+}
+
+.link{
+    float: right;
+    margin-top: 5px;
+    cursor: pointer;
+    color: #0645AD;
+}
+.link:hover{
+    text-decoration: underline;
+}

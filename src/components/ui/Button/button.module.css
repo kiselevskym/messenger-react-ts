@@ -1,0 +1,11 @@
+.root{
+    width: 100%;
+    padding: 10px 10px;
+    background: #3390ec;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}

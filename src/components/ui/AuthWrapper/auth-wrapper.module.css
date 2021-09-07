@@ -1,0 +1,35 @@
+.root {
+    display: flex;
+    justify-content: center;
+}
+
+.info {
+    text-align: center;
+}
+
+.main {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 50px;
+    width: 350px;
+
+}
+
+.img {
+    width: 200px;
+    margin-bottom: 50px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.subtitle {
+    width: 300px;
+    margin: 0 auto;
+    color: rgba(0, 0, 0, .9);
+    margin-bottom: 50px;
+}
