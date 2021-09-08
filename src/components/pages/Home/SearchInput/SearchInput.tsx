@@ -3,7 +3,7 @@ import s from './search-input.module.css'
 
 const SearchInput = () => {
     return (
-        <input className={s.root} placeholder={"Поиск контактов"}/>
+        <div></div>
     );
 };
 

@@ -5,11 +5,11 @@ const TopInformation = () => {
     return (
         <div className={s.root}>
             <div className={s.avatar}>
-                <img src="http://s3.amazonaws.com/37assets/svn/765-default-avatar.png" alt="picture"/>
+                <img src="https://t3.ftcdn.net/jpg/01/09/00/64/360_F_109006426_388PagqielgjFTAMgW59jRaDmPJvSBUL.jpg" alt="picture"/>
             </div>
-            <div className={s.usernameInfo}>
-                <div className={s.usernameNickname}>nickname</div>
-                <div className={s.usernameLastSeen}>last seen</div>
+            <div className={s.userInfo}>
+                <div className={s.userNickname}>nickname</div>
+                <div className={s.userLastSeen}>last seen</div>
             </div>
         </div>
     );

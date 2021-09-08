@@ -9,18 +9,16 @@
 .avatar img{
     width: 40px;
     border-radius: 100%;
-    border: 1px solid silver;
 }
-.usernameInfo{
+.userInfo{
     margin-left: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
-.usernameNickname{
-
+.userNickname{
+    font-weight: 500;
 }
-.usernameLastSeen{
+.userLastSeen{
     font-size: 12px;
-
 }

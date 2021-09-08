@@ -1,22 +1,38 @@
-.root{
+.root {
+    position: relative;
+    display: flex;
+    align-items: center;
     width: 100%;
-    height: 50px;
+    height: 65px;
+    margin-top: 5px;
+    padding: 0 5px;
     background: #FFFFFF;
     border-radius: 5px;
-    margin-top: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 5px;
+    cursor: pointer;
 }
-
-.avatar img{
+.root:hover{
+    transform: scale(1.03);
+    background:#F9F9F9;
+}
+.avatar img {
     width: 40px;
     border-radius: 100%;
 }
-.usernameNickname{
-    font-size: 16px;
+
+.user{
+    margin-left: 7px;
 }
-.usernameLastMessage{
+.userNickname {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.userLastMessage {
     font-size: 12px;
+}
+.userLastMessageTime{
+    font-size: 12px;
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
 }

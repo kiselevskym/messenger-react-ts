@@ -1,0 +1,19 @@
+.root{
+    width: 100%;
+    overflow: hidden;
+}
+
+.message{
+    max-width: 400px;
+    word-wrap: break-word;
+    margin: 7px 0;
+    background: #FFFFFF;
+    border-radius: 5px;
+    display: inline-block;
+    padding: 5px;
+}
+.myMessage{
+    float: right;
+    background: #3390ec;
+    color: #FFFFFF;
+}

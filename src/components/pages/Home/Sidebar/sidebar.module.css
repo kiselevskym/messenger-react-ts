@@ -1,6 +1,15 @@
 .root{
-    width: 300px;
+    width: 400px;
     height: 100vh;
-    background: #F9D4CC;
-    padding: 5px;
+    background: #D9ECFF;
+    padding: 10px;
+}
+
+.searchInput{
+    width: 100%;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 15px;
 }
