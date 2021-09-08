@@ -1,18 +1,20 @@
 import React from 'react';
-import AuthWrapper from "../../../ui/AuthWrapper/AuthWrapper";
-import Input from "../Input/Input";
+
 import {useForm} from "react-hook-form";
-import {AuthInput} from "../../../../shared/interfaces/AuthInput";
-import s from '../auth.module.css'
-import Button from "../../../ui/Button/Button";
+
 import {useHistory} from "react-router-dom";
 import * as yup from "yup"
-import {emailText, minText, reqText} from "../validateText";
+
 import {yupResolver} from "@hookform/resolvers/yup";
 import {signInWithEmailAndPassword} from "firebase/auth"
+
+import {AuthInput} from "../../../../shared/interfaces/AuthInput";
+import AuthWrapper from "../../../ui/AuthWrapper/AuthWrapper";
 import auth from "../../../../firebase/firebase";
-import {useSelector} from "react-redux";
-import {selectAuth} from "../../../../store/store";
+import {emailText, minText, reqText} from "../validateText";
+import s from '../auth.module.css'
+import Button from "../../../ui/Button/Button";
+import Input from "../Input/Input";
 
 const scheme = yup.object().shape({
     email: yup.string().required(reqText).email(emailText).trim(),
@@ -42,7 +44,7 @@ const Login = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Input className={s.root__input} placeholder={"Введите электронную почту"} label={"email"}
                        register={register}/>
-                <Input className={s.root__input} placeholder={"Введите свой пароль"} label={"password"}
+                <Input type={'password'} className={s.root__input} placeholder={"Введите свой пароль"} label={"password"}
                        register={register}/>
                 <Button className={s.root__button}>
                     Войти

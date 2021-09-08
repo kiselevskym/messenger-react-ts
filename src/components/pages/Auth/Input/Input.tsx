@@ -10,10 +10,11 @@ type InputProps = {
     register: UseFormRegister<AuthInput>;
     className?: string;
     placeholder?: string
+    type?: string | 'text'
 };
 
-const Input = ({label, register, className, placeholder}: InputProps) => (
-    <input className={s.root + " " + className} placeholder={placeholder} {...register(label)} />
+const Input = ({label, register, className, placeholder, type}: InputProps) => (
+    <input type={type} className={s.root + " " + className} placeholder={placeholder} {...register(label)} />
 );
 
 export default Input;

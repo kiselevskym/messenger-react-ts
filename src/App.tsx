@@ -69,7 +69,6 @@ function App() {
                     <UserDetails/>
                 </Route>
             </Switch>
-            <div onClick={() => signOut(auth)}>{currentUser?.email}</div>
         </div>
     );
 }
