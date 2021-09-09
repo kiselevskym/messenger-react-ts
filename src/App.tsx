@@ -13,6 +13,7 @@ import {selectAuth} from "./store/store";
 import UserDetails from "./components/pages/Auth/UserDetails/UserDetails";
 import {doc, getDoc, getFirestore} from "firebase/firestore";
 import {selectAuthCurrentUser, selectAuthIsLoaded} from "./store/selectors/authSelectors";
+import {fetchUserProfileData} from "./api/usersAPI"
 
 
 function App() {
@@ -20,14 +21,20 @@ function App() {
     const history = useHistory()
     const dispatch = useDispatch()
     const currentUser = useSelector(selectAuthCurrentUser)
+
     React.useEffect(() => {
         dispatch(loadingIsStated())
         onAuthStateChanged(auth, (user) => {
             dispatch(setCurrentUser(user))
             dispatch(loadingIsEnded())
+
         })
     }, [])
 
+
+    fetchUserProfileData("d8aNqJCjeveqLfRld1Sd5CVmXm43").then(() => {
+        console.log("fetched")
+    })
 
     if (!isAuthLoaded) {
         return (

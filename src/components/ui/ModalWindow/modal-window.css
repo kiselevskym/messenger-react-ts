@@ -1,0 +1,23 @@
+.modal{
+    width: 600px;
+    min-height: 500px;
+    margin: 0 auto;
+    padding: 15px;
+    position: fixed;
+    background: #FFFFFF;
+    z-index: 2;
+    border-radius: 15px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.mutedback{
+    position: absolute;
+    background: rgba(0,0,0,.5);
+    width: 100vw;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    z-index: 1;
+}

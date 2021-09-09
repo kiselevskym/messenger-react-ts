@@ -18,10 +18,14 @@ const Sidebar = () => {
 
     return (
         <div className={s.root}>
-            <input onBlur={() => setIsContactsSearched(false)} onFocus={() => setIsContactsSearched(true)}
-                   className={s.searchInput} placeholder={"Поиск контактов"}/>
-
-            {isContactsSearched ? searchedContactsItems : chatItems }
+            <div>
+                <div>
+                    btn
+                </div>
+                <input onBlur={() => setIsContactsSearched(false)} onFocus={() => setIsContactsSearched(true)}
+                       className={s.searchInput} placeholder={"Поиск контактов"}/>
+            </div>
+            {isContactsSearched ? searchedContactsItems : chatItems}
             <Logout/>
         </div>
     );

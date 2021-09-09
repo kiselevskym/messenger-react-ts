@@ -12,6 +12,7 @@ import {setDoc, doc, getFirestore, getDoc} from "firebase/firestore";
 import {useSelector} from "react-redux";
 import {selectAuthCurrentUser} from "../../../../store/selectors/authSelectors";
 import {useHistory} from "react-router-dom";
+import {addUserProfileData} from "../../../../api/usersAPI";
 const scheme = yup.object().shape({
     name: yup.string().required().min(3),
     about: yup.string()
@@ -31,9 +32,12 @@ const UserDetails = () => {
             country: "USA"
         });
     }
-    const onSubmitClick = () => {
-        addUser().then((dat)=>{
+    const onSubmitClick = (data: AuthInput) => {
 
+        const uid = currentUser?.uid
+
+        addUserProfileData(uid, {name: data.name}).then(()=>{
+            console.log('added')
         })
     }
 
