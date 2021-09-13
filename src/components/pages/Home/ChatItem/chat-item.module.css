@@ -1,23 +1,23 @@
 .root {
     position: relative;
     display: flex;
-    align-items: center;
     width: 100%;
-    height: 65px;
     margin-top: 5px;
-    padding: 0 5px;
+    padding: 10px 7px;
+    border-radius: 10px;
     background: #FFFFFF;
-    border-radius: 5px;
     cursor: pointer;
 }
 .root:hover{
     transform: scale(1.03);
-    background:#F9F9F9;
+    background:#3390ec;
 }
-.avatar img {
-    width: 40px;
+.avatar{
+    width: 50px;
+    height: 50px;
     border-radius: 100%;
 }
+
 
 .user{
     margin-left: 7px;

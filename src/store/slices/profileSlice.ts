@@ -1,7 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {authSlice} from "./authSlice";
 import {useSelector} from "react-redux";
-import {selectAuthCurrentUser} from "../selectors/authSelectors";
+
 
 
 

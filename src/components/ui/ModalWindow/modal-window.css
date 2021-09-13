@@ -1,8 +1,8 @@
 .modal{
     width: 600px;
-    min-height: 500px;
+    min-height: 11px;
     margin: 0 auto;
-    padding: 15px;
+    padding: 10px 0;
     position: fixed;
     background: #FFFFFF;
     z-index: 2;

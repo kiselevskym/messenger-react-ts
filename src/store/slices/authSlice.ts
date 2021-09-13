@@ -1,13 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import firebase from "firebase/auth";
+
 
 export interface authState {
-    currentUser: firebase.User | null,
+    uid: string | undefined,
+    isAuth: boolean,
     isLoaded: boolean
 }
 
 const initialState: authState = {
-    currentUser: null,
+    uid: undefined,
+    isAuth: false,
     isLoaded: false
 }
 
@@ -15,8 +17,13 @@ export const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setCurrentUser: (state, action: PayloadAction<firebase.User | null>) => {
-            state.currentUser = action.payload
+        setCurrentUser: (state, action: PayloadAction<string | undefined>) => {
+            state.uid = action.payload
+            if(typeof action.payload === 'string'){
+                state.isAuth = true
+            }else{
+                state.isAuth = false
+            }
         },
         loadingIsStated: (state) => {
             state.isLoaded = false

@@ -1,15 +1,93 @@
 .root{
-    width: 400px;
+    width: 350px;
     height: 100vh;
     background: #D9ECFF;
     padding: 10px;
 }
 
 .searchInput{
-    width: 100%;
+    width: calc(100% - 50px);
     padding: 5px 10px;
     border: none;
     border-radius: 5px;
     font-size: 16px;
     margin-bottom: 15px;
+}
+
+.nav{
+    display: flex;
+    justify-content: space-between;
+    height: 50px;
+}
+
+.menuBtn{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    background: #FFFFFF;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+
+.menuBtn div{
+    width: 20px;
+    height: 3px;
+    background: #4ca2cd;
+    border-radius: 1px;
+    transition: .1s;
+}
+.menuBtn div:first-child{
+    margin-bottom: 3px;
+}
+.menuBtn div:last-child{
+    margin-top: 3px;
+}
+
+.menuBtn:hover div:first-child{
+    margin-bottom: 5px;
+}
+.menuBtn:hover div:last-child{
+    margin-top: 5px;
+}
+
+.menu li{
+    width: 100%;
+    padding: 20px 0;
+    text-align: center;
+    transition: .3s;
+    cursor: pointer;
+}
+.menu li:hover{
+    background: silver;
+}
+
+
+.profile{
+    padding: 20px;
+}
+.profileInfo{
+    display: flex;
+    justify-content: center;
+}
+.profileInfoImg{
+    width: 100px;
+    margin-right: 15px;
+}
+.profileInfoText{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.profileInfoName{
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.profileInfoLastseen{
+    font-size: 14px;
+    color: rgba(0,0,0,.7);
 }

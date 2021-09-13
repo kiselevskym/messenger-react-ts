@@ -1,15 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
-*{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+
+* {
+    margin: 0;
+    padding: 0;
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
 }
-body{
-  font-family: 'Roboto', sans-serif;
+
+body {
+    font-family: 'Roboto', sans-serif;
 }
-img{
-  width: 100%;
+
+img {
+    width: 100%;
 }
-input{
-  outline: none;
+
+input {
+    outline: none;
+}
+
+li {
+    list-style: none;
 }

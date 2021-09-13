@@ -1,36 +1,51 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import s from './main-content.module.css'
 import TopInformation from "../TopInformation/TopInformation";
-import MessageItem from "../MessageItem/MessageItem";
+import InputMessage from "../InputMessage/InputMessage";
+import Messages from "../Messages/Messages";
+import {useSelector} from "react-redux";
+import {selectCommunicationWith} from "../../../../store/selectors/chatSelectors";
+import usersAPI from "../../../../api/usersAPI";
 
 const MainContent = () => {
+    const communicationWith = useSelector(selectCommunicationWith)
+    const [username, setUsername] = React.useState("")
+    const [isLoaded, setLoaded] = React.useState(false)
+
+
+
+    useEffect(()=>{
+        setLoaded(false)
+        if(communicationWith) {
+            usersAPI.getUserById(communicationWith).then((data: any) => {
+
+                setUsername(data.name)
+                setLoaded(true)
+            })
+        }
+    },[communicationWith])
+
+    if (!communicationWith || !isLoaded) {
+        return (
+            <div className={s.root}>
+                select chat
+            </div>)
+    }
+
     return (
         <div className={s.root}>
-            <TopInformation/>
-            <div className={s.messages}>
-                <MessageItem message={"Сервис онлайн проверки текста на уникальность Text.ru покажет процент уникальности текста. Глубокая и качественная проверка найдет дубликаты и рерайт."} my={true}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
-                <MessageItem message={"Привет"}/>
+            <TopInformation uid={username}/>
+            <div className={s.messagesContainer}>
+                <div className={s.chatWidth}>
+                    <Messages/>
+                </div>
+            </div>
+            <div className={s.chatWidth}>
+                <InputMessage username={username} className={s.root__input}/>
             </div>
         </div>
     );
 };
 
 export default MainContent;
+

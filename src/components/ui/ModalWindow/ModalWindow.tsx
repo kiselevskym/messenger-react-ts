@@ -4,31 +4,31 @@ import ReactDOM from "react-dom";
 
 interface ModalProps {
     children: JSX.Element | JSX.Element[]
+    show: boolean,
+    setShow: (is: boolean) => void
 }
 
 
 const modalRoot = document.getElementById('modal');
-const ModalWindow = ({children}: ModalProps) => {
-    const [showModal, setShowModal] = React.useState(true)
+const ModalWindow = ({children, show, setShow}: ModalProps) => {
+
     const modalRef = React.useRef(null)
-    const div = document.createElement('div')
-    useEffect(() => {
-        modalRoot!.appendChild(div)
-    })
+    const backgroundRef = React.useRef(null)
+
 
     const onCloseClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        if(e.target !== modalRef.current){
-            setShowModal(false)
+        if(e.target === backgroundRef.current){
+            setShow(false)
         }
     }
-    if(!showModal) return <div></div>
-    return ReactDOM.createPortal(
-        <div className={"mutedback"} onClick={onCloseClick}>
+
+    if(!show) return <></>
+    return (
+        <div className={"mutedback"} onClick={onCloseClick} ref={backgroundRef}>
             <div className={"modal"} ref={modalRef}>
                 {children}
             </div>
-        </div>,
-        div
+        </div>
     );
 };
 
