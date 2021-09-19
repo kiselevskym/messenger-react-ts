@@ -13,14 +13,25 @@ interface InputMessageProps {
 }
 
 const InputMessage = ({className, username}: InputMessageProps) => {
+
     const communicationWith = useSelector(selectCommunicationWith)
     const uid = useSelector(selectUid)
     const [message, setMessage] = React.useState("")
+    const [usernamet, setUsername] =React.useState("")
+    React.useEffect(()=>{
+        if(!uid) return
+        const unsubscribe = usersAPI.getUserById(uid).then((data: any)=>{
+            setUsername(data.name)
+        })
+        return ()=>setMessage("");
+    },[])
+
+
     const onPressEnter = (e: any) => {
 
         if (e.code === "Enter") {
             if (uid !== undefined && communicationWith !== undefined) {
-                usersAPI.sendMessage(uid, communicationWith, message, username)
+                usersAPI.sendMessage(uid, communicationWith, message, usernamet)
                 setMessage("")
 
             }

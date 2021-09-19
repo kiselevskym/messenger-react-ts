@@ -1,17 +1,23 @@
 .root{
-    width: 350px;
-    height: 100vh;
-    background: #D9ECFF;
-    padding: 10px;
+    min-width: 400px;
+    width: 400px;
+    background: #FFFFFF;
 }
 
-.searchInput{
-    width: calc(100% - 50px);
-    padding: 5px 10px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    margin-bottom: 15px;
+.menu{
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,.5);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1;
+}
+
+.menu ul{
+    width: 300px;
+    height: 100%;
+    background: #FFFFFF;
 }
 
 .nav{
@@ -40,19 +46,7 @@
     border-radius: 1px;
     transition: .1s;
 }
-.menuBtn div:first-child{
-    margin-bottom: 3px;
-}
-.menuBtn div:last-child{
-    margin-top: 3px;
-}
 
-.menuBtn:hover div:first-child{
-    margin-bottom: 5px;
-}
-.menuBtn:hover div:last-child{
-    margin-top: 5px;
-}
 
 .menu li{
     width: 100%;
@@ -66,28 +60,104 @@
 }
 
 
-.profile{
-    padding: 20px;
-}
-.profileInfo{
+
+.nav{
     display: flex;
-    justify-content: center;
+    align-items: center;
+    padding: 5px;
 }
-.profileInfoImg{
-    width: 100px;
-    margin-right: 15px;
-}
-.profileInfoText{
+
+.menuButton{
+    width: 40px;
+    height: 40px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
+    border-radius: 100%;
+    cursor: pointer;
 }
-.profileInfoName{
-    font-size: 22px;
+.menuButton div{
+    display: block;
+    margin: 2px auto;
+    width: 25px;
+    height: 4px;
+    border-radius: 1px;
+    background: #696969;
+}
+
+
+.chats{
+    overflow-y: scroll;
+    height: 100%;
+}
+.chats::-webkit-scrollbar {
+    width: 4px;
+    background: transparent;
+}
+.chats::-webkit-scrollbar-thumb {
+    background: silver;
+}
+
+
+.input{
+    width: calc(100% - 50px);
+    font-size: 16px;
+    padding: 6px 12px;
+    border: 1px #ededed solid;
+    border-radius: 2px;
+    background: #ededed;
+}
+.input:focus{
+    background: #FFFFFF;
+    border: 1px #4ca2cd solid;
+}
+
+.profile{
+    position: relative;
+    background: #4ca2cd;
+    padding: 20px 15px;
+}
+.profileImg img{
+    width: 80px;
+    height: 80px;
+    border-radius: 100%;
+}
+.profileName{
+    font-size: 18px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-top: 10px;
 }
-.profileInfoLastseen{
-    font-size: 14px;
-    color: rgba(0,0,0,.7);
+.profileEmail{
+    color: #f0f0f0;
+}
+.profileBookmark{
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    cursor: pointer;
+}
+
+
+
+.settingsTop{
+    display: flex;
+    align-items: center;
+    height: 50px;
+    padding: 0 25px;
+}
+.settingsTopText{
+    font-weight: bold;
+    font-size: 20px;
+    margin-left: 40px;
+}
+.settingsTopPrev{
+    cursor: pointer;
+}
+
+@media screen and (max-width: 761px) {
+    .root{
+        width: 100vw !important;
+
+    }
 }

@@ -1,103 +1,191 @@
-import React, {useEffect} from 'react';
+import React, {ChangeEvent, useEffect} from 'react';
 import s from './sidebar.module.css'
+import {collection, query, where, getDocs} from "firebase/firestore";
+import {db} from "../../../../firebase/firebase";
+import {getAuth, signOut} from "firebase/auth"
 import ChatItem from "../ChatItem/ChatItem";
-import ModalWindow from "../../../ui/ModalWindow/ModalWindow";
-import {getAuth, signOut, updateProfile} from 'firebase/auth'
-import firebase, {db} from "../../../../firebase/firebase";
-import {useSelector} from "react-redux";
+import {useTransition, animated, config} from "react-spring";
+import {RiBookmarkFill} from 'react-icons/ri'
+import {setCommunicationWith} from "../../../../store/slices/chatSlice";
+import {useDispatch, useSelector} from "react-redux";
 import {selectUid} from "../../../../store/selectors/authSelectors";
-import IMessage from "../../../../shared/interfaces/IMessage";
-import {collection, onSnapshot, orderBy, query, where} from "firebase/firestore";
-import usersAPI, {generateId} from "../../../../api/usersAPI";
-import IUserData from "../../../../shared/interfaces/IUserData";
+import ChatItemLoader from "../ChatItem/ChatItemLoader";
+import {selectProfileState} from "../../../../store/selectors/profileSelectors";
+import {GrFormPreviousLink} from "react-icons/gr";
+import Input from "../../Auth/Input/Input";
+import {useForm} from "react-hook-form";
+import {AuthInput} from "../../../../shared/interfaces/AuthInput";
+import UserDataInput from "../../../../shared/interfaces/UserDataInput";
+import {ImageUpload} from "../../../ui/ImageUpload/ImageUpload";
 
+interface SidebarProps {
+    chats: JSX.Element[]
+}
 
-const Sidebar = () => {
-    const [showMenu, setShowMenu] = React.useState(false)
-    const [showProfile, setShowProfile] = React.useState(false)
-    const [chats, setChats] = React.useState([])
-    const [isLoaded, setLoaded] = React.useState(false)
-    const user = getAuth().currentUser
+const Sidebar = ({chats}: SidebarProps) => {
+    const [showMenu, setShowMenu] = React.useState(false);
+    const [lookingForContacts, setLookingForContacts] = React.useState(false);
+    const [input, setInput] = React.useState("")
+    const [contacts, setContacts] = React.useState([])
+    const [renderComponentName, setRenderComponentName] = React.useState<"default" | "settings">("default")
+
     const uid = useSelector(selectUid)
-    useEffect(() => {
-        if (!uid) return
-
-        const chatsRef = collection(db, "conversations")
-        const q = query(chatsRef, where("users", "array-contains-any", [uid]))
+    const profile = useSelector(selectProfileState)
+    const dispatch = useDispatch()
 
 
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const chats: any = [];
-            querySnapshot.forEach((doc) => {
-                chats.push(doc.data());
+    const transition = useTransition(showMenu, {
+        from: {x: -300},
+        enter: {x: 0},
+        leave: {x: -300},
+        reverse: !showMenu,
+        delay: 0,
+        config: {duration: 150}
+    })
 
-            });
-            setChats(chats)
+    async function fetchUsers() {
+        const q = query(collection(db, "users"), where("name", "==", input));
 
+        const contacts: any = []
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            contacts.push(doc.data())
         });
+        setContacts(contacts)
+    }
 
-        return unsubscribe
+    React.useEffect(() => {
+        if (input.length > 2) {
+            fetchUsers()
+        }
+
+
+        if (input.length > 0) {
+            setLookingForContacts(true)
+        } else {
+            setLookingForContacts(false)
+        }
+    }, [input])
+
+    useEffect(() => {
+
     }, [])
+    const contactsItems = contacts.map((item: any, _) => (
+        <ChatItem uid={item.uid} username={item.name} lastMessage={"Тут ничего нет"} time={""} lastSender={""}
+                  picture={"https://t3.ftcdn.net/jpg/01/09/00/64/360_F_109006426_388PagqielgjFTAMgW59jRaDmPJvSBUL.jpg"}/>
+    ))
 
-
-    const onShowMenuClick = () => {
+    const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
+        setInput(e.target.value)
+    }
+    const onClickShowMenu = () => {
         setShowMenu(true)
     }
-    const onShowMyProfileClick = () => {
+    const onBookmarkClick = () => {
+        dispatch(setCommunicationWith(uid))
         setShowMenu(false)
-        setShowProfile(true)
+    }
+    const onSignOutClick = () => {
+        signOut(getAuth())
+    }
+    const onClickCloseMenu = (e: any) => {
+        if (e.target.className === s.menu) {
+            setShowMenu(false)
+        }
+    }
+
+    const onSettingsClick = () => {
+        setShowMenu(false)
+        setRenderComponentName("settings")
+    }
+
+    const onTEST = () => {
+        setRenderComponentName("default")
     }
 
 
-    const chatItems = chats.map((item: IMessage | any, _) => {
-        const memberId = item.users[0] === uid ? item.users[1] : item.users[0]
-        return <ChatItem uid={memberId} key={item.timestamp + _} username={item.username}
-                         lastMessage={item.message} time={item.timestamp}/>
-    })
+    const { register, handleSubmit, watch, formState: { errors } } = useForm<UserDataInput>();
+    const onSubmit = (data: any) => console.log(data);
+
+    let render
+    if (renderComponentName === "settings") {
+        render = (
+            <>
+                <div className={s.settingsTop}>
+                    <div className={s.settingsTopPrev} onClick={onTEST}>
+                        <GrFormPreviousLink size={"30"}/>
+                    </div>
+                    <div className={s.settingsTopText}>
+                        Настройки
+                    </div>
+                </div>
+
+                <div className={s.settingsMain}>
+                    <ImageUpload />
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <Input type={'name'} className={s.root__input} placeholder={"Введите свой пароль"} label={"name"}
+                               register={register}/>
+                        <Input type={'password'} className={s.root__input} placeholder={"Введите свой пароль"} label={"bio"}
+                               register={register}/>
+                        <Input type={'password'} className={s.root__input} placeholder={"Введите свой пароль"} label={"tag"}
+                               register={register}/>
+
+                        <input type="submit" />
+                    </form>
+                </div>
+
+
+            </>)
+    } else if (renderComponentName === "default") {
+        render = (
+            <>
+                <nav role="navigation" className={s.nav}>
+                    <div className={s.menuButton} onClick={onClickShowMenu}>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <input value={input} onChange={onChangeInput} placeholder={"Поиск"} className={s.input}/>
+                </nav>
+                <div className={s.chats}>
+                    {!lookingForContacts ? chats.length ? chats : new Array(8).fill("_").map((item, id) =>
+                        <ChatItemLoader key={id}/>) : contactsItems}
+
+                </div>
+            </>
+        )
+    }
+
 
     return (
         <>
-            <ModalWindow setShow={setShowMenu} show={showMenu}>
-                <div className={s.menu}>
-                    <ul>
-                        <li onClick={onShowMyProfileClick}>Мой профиль</li>
-                        <li>Настройки</li>
-                        <li onClick={() => signOut(firebase)}>Выйти</li>
-                    </ul>
-                </div>
-            </ModalWindow>
-            <ModalWindow setShow={setShowProfile} show={showProfile}>
-                <div className={s.profile}>
-                    <div className={s.profileInfo}>
-                        <div className={s.profileInfoImg}>
-                            <img
-                                src={user?.photoURL !== null ? user?.photoURL : "https://image.flaticon.com/icons/png/512/147/147144.png"}
-                                alt=""/>
+            {transition((style, item) => (
+                item && <div className={s.menu} onClick={(e) => onClickCloseMenu(e)}>
+                    <animated.ul style={style}>
+                        <div className={s.profile}>
+                            <div className={s.profileImg}>
+                                <img
+                                    src="https://t3.ftcdn.net/jpg/01/09/00/64/360_F_109006426_388PagqielgjFTAMgW59jRaDmPJvSBUL.jpg"
+                                    alt=""/>
+                            </div>
+                            <div className={s.profileUser}>
+                                <div className={s.profileBookmark} onClick={onBookmarkClick}><RiBookmarkFill
+                                    color={'#FFFFFF'} size={'24'}/></div>
+                                <div className={s.profileName}>{profile.data.name}</div>
+                                <div className={s.profileEmail}>{getAuth().currentUser?.email}</div>
+                            </div>
                         </div>
-                        <div className={s.profileInfoText}>
-                            <div className={s.profileInfoName}>username</div>
-                            <div className={s.profileInfoLastseen}>last seen today at 11:20</div>
-                        </div>
-                    </div>
+                        <li onClick={onSettingsClick}>Настройки</li>
+                        <li onClick={onSignOutClick}>Выйти</li>
+                    </animated.ul>
                 </div>
-            </ModalWindow>
-            <div className={s.root}>
-                <div className={s.nav}>
-                    <div className={s.menuBtn} onClick={onShowMenuClick}>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                    </div>
-                    <input
-                        className={s.searchInput} placeholder={"Поиск контактов"}/>
-                </div>
-                <div>
-                    {chatItems}
-                </div>
-
+            ))}
+            <div className={s.root} id={"sidebar"}>
+                {render}
             </div>
         </>
     );
+
 };
 
 export default Sidebar;

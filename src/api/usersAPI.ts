@@ -35,6 +35,7 @@ export const api = {
 
         await setDoc(doc(getFirestore(), "users", `${uid}`), {
             name,
+            uid,
         });
     },
     sendMessage: (sender: string, receiver: string, message: string, username: string) => {
@@ -44,14 +45,14 @@ export const api = {
             sender,
             users: generateId(sender, receiver),
             timestamp: Date.now(),
-            message
+            text: message
         })
 
         setDoc(doc(db, "conversations", generateId(sender, receiver)), {
-            username,
             users: [sender, receiver],
             timestamp: Date.now(),
-            message
+            lastText: message,
+            lastSender: username
         });
 
     },

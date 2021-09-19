@@ -1,10 +1,8 @@
-type IMessage = {
-    message: string,
+type MessageInterface = {
+    text: string,
     timestamp: string,
     users: string,
     sender: string,
-    user: object & {
-        name: string
-    }
 }
-export default IMessage
+
+export default MessageInterface

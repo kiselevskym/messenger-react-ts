@@ -1,10 +1,17 @@
-import {createSlice} from "@reduxjs/toolkit";
-import {authSlice} from "./authSlice";
-import {useSelector} from "react-redux";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import usersAPI from "../../api/usersAPI";
 
 
 
 
+
+export const fetchUserUserDataById = createAsyncThunk(
+    "profile/fetchUserDataById",
+    async (userUID: string) => {
+        const response = await usersAPI.getUserById(userUID)
+        return response
+    }
+)
 // const fetchUserProfileDataById = createAsyncThunk(
 //     'users/fetchProfileDataById',
 //     async (userId: string) => {
@@ -14,25 +21,37 @@ import {useSelector} from "react-redux";
 // )
 
 interface stateProps {
-    name: string
+    data: object & {
+      name: string
+    },
+    status: 'loading' | 'finished' | 'error'
 }
 
 const initialState: stateProps = {
-    name: ""
+    data: {
+        name: ""
+    },
+    status: "loading"
 }
 
 export const profileSlice = createSlice({
-    name: "profileSlice",
+    name: "profile",
     initialState,
     reducers: {
 
     },
     extraReducers: (builder) => {
-        // builder.addCase(fetchUserProfileDataById.pending, (state, action) => {
-        //     // both `state` and `action` are now correctly typed
-        //     // based on the slice state and the `pending` action creatos
-        // })
-    },
+        builder.addCase(fetchUserUserDataById.pending, (state, action)=>{
+            state.status = "loading"
+        });
+        builder.addCase(fetchUserUserDataById.fulfilled, (state, action)=>{
+            state.status = "finished"
+            // @ts-ignore
+            state.data = action.payload
+        })
+
+
+    }
 })
 
 export const {} = profileSlice.actions

@@ -11,57 +11,64 @@ import {loadingIsEnded, loadingIsStated, setCurrentUser} from "./store/slices/au
 import UserDetails from "./components/pages/Auth/UserDetails/UserDetails";
 import {doc, getDoc, getFirestore} from "firebase/firestore";
 import {selectAuthIsLoaded, selectIsAuth, selectUid} from "./store/selectors/authSelectors";
-import api from "./api/usersAPI"
 import usersAPI from "./api/usersAPI";
+import Loader from "./components/ui/Loader/Loader";
+import {fetchUserUserDataById} from "./store/slices/profileSlice";
+
+
 
 
 function App() {
-    const isAuthLoaded = useSelector(selectAuthIsLoaded)
     const history = useHistory()
     const dispatch = useDispatch()
+
+
+
+    const isAuthLoaded = useSelector(selectAuthIsLoaded)
     const isUserAuth = useSelector(selectIsAuth)
     const uid = useSelector(selectUid)
 
-    console.log("rerender")
+
 
     React.useEffect(() => {
-
         dispatch(loadingIsStated())
         onAuthStateChanged(auth, (user) => {
             dispatch(setCurrentUser(user?.uid))
             dispatch(loadingIsEnded())
-
         })
-    }, [])
+
+
+        uid && dispatch(fetchUserUserDataById(uid))
+
+    }, [uid])
 
 
 
 
     if (!isAuthLoaded) {
         return (
-            <div>
-                loading
-            </div>
+           <Loader/>
         )
     }
 
 
-    async function getUser(uid: string|undefined) {
-        if(uid===undefined) return
+    async function checkUserHasDetails(uid: string) {
         const docRef = doc(getFirestore(), "users", uid);
         const docSnap = await getDoc(docRef);
 
-
         if (!docSnap.exists() && isUserAuth !== null) {
             history.push('/details')
-        }else {
+        } else {
             history.push('/')
         }
 
     }
 
+
     if (!isUserAuth) history.push('/login')
-    getUser(uid)
+    uid && checkUserHasDetails(uid)
+
+
     return (
         <div className="window">
             <Switch>

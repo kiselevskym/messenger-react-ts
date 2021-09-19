@@ -2,35 +2,42 @@
     position: relative;
     display: flex;
     width: 100%;
-    margin-top: 5px;
+    margin-bottom: 5px;
     padding: 10px 7px;
-    border-radius: 10px;
+    border-radius: 2px;
     background: #FFFFFF;
     cursor: pointer;
 }
-.root:hover{
-    transform: scale(1.03);
-    background:#3390ec;
+
+.root:hover {
+    background: #f0f0f0;
 }
-.avatar{
+
+.avatar img{
     width: 50px;
     height: 50px;
     border-radius: 100%;
 }
 
-
-.user{
-    margin-left: 7px;
+.user {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 10px;
 }
+
 .userNickname {
     font-size: 16px;
     font-weight: 500;
+    margin-bottom: 5px;
 }
 
 .userLastMessage {
     font-size: 12px;
+    color: #808080;
 }
-.userLastMessageTime{
+
+.userLastMessageTime {
     font-size: 12px;
     position: absolute;
     right: 5px;
