@@ -5,11 +5,13 @@
     background: -webkit-linear-gradient(to right, #4ca2cd, #67B26F); /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(to right, #4ca2cd, #67B26F); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     margin: 0 auto;
+
 }
 
 .messagesContainer {
+
     height: calc(100% - 100px);
-    overflow-y: scroll;
+    overflow-y: overlay;
     margin: 0 auto;
 }
 
@@ -19,6 +21,7 @@
 }
 
 .messagesContainer::-webkit-scrollbar {
+
     width: 10px;
     background: transparent;
 }

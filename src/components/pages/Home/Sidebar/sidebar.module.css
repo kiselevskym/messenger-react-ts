@@ -141,20 +141,42 @@
 
 
 .settingsTop{
-    display: flex;
-    align-items: center;
-    height: 50px;
-    padding: 0 25px;
+    position: relative;
+
+    padding: 10px 25px;
+    text-align: center;
 }
 .settingsTopText{
     font-weight: bold;
     font-size: 20px;
-    margin-left: 40px;
+
+
 }
 .settingsTopPrev{
     cursor: pointer;
+    position: absolute;
+    left: 0
 }
 
+.settings{
+    padding: 0 15px;
+}
+.settingsMain{
+    margin-top: 40px;
+}
+.settings__input{
+    margin-top: 25px;
+}
+.settingsBtn{
+    margin-top: 40px;
+}
+
+.settingsDescription{
+    color: rgb(89, 89, 89);
+    font-size: 13px;
+    letter-spacing: -.1px;
+    line-height: 0px;
+}
 @media screen and (max-width: 761px) {
     .root{
         width: 100vw !important;

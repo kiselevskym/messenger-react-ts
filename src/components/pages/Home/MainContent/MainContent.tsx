@@ -13,18 +13,18 @@ import {useScroll} from "react-use";
 
 interface MainContentProps {
     messages:  JSX.Element[],
-    isMessagesLoaded: boolean
+    isMessagesLoaded: boolean,
+    func: any
 }
 const t = document.getElementById("scroll")
 
-const MainContent = ({messages, isMessagesLoaded}: MainContentProps) => {
+const MainContent = ({messages, isMessagesLoaded, func}: MainContentProps) => {
     const communicationWith = useSelector(selectCommunicationWith)
     const [username, setUsername] = React.useState("")
     const [isLoaded, setLoaded] = React.useState(false)
     const uid = useSelector(selectUid)
 
     const ref = React.useRef<HTMLDivElement>(null);
-    const {x, y} = useScroll(ref);
     const dispatch = useDispatch()
 
     const onCloseConversation = () => {
@@ -80,8 +80,9 @@ const MainContent = ({messages, isMessagesLoaded}: MainContentProps) => {
     return (
         <div className={s.root} id={"main"}>
             <TopInformation uid={username} onCloseConversation={onCloseConversation}/>
-            <div className={s.messagesContainer} ref={ref} id={"scroll"}>
-                <button>LOAD MORE MESSAGES</button>
+            <div className={s.messagesContainer} ref={ref}>
+
+                <button onClick={func}>LOAD MORE MESSAGES</button>
                 <div className={s.chatWidth}>
                     {messages}
                 </div>

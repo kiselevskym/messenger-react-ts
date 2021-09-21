@@ -2,9 +2,6 @@ import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import usersAPI from "../../api/usersAPI";
 
 
-
-
-
 export const fetchUserUserDataById = createAsyncThunk(
     "profile/fetchUserDataById",
     async (userUID: string) => {
@@ -22,14 +19,18 @@ export const fetchUserUserDataById = createAsyncThunk(
 
 interface stateProps {
     data: object & {
-      name: string
+        name: string,
+        about: string,
+        tag: string
     },
     status: 'loading' | 'finished' | 'error'
 }
 
 const initialState: stateProps = {
     data: {
-        name: ""
+        name: "",
+        about: "",
+        tag: ""
     },
     status: "loading"
 }
@@ -37,17 +38,19 @@ const initialState: stateProps = {
 export const profileSlice = createSlice({
     name: "profile",
     initialState,
-    reducers: {
-
-    },
+    reducers: {},
     extraReducers: (builder) => {
-        builder.addCase(fetchUserUserDataById.pending, (state, action)=>{
+        builder.addCase(fetchUserUserDataById.pending, (state, action) => {
             state.status = "loading"
         });
-        builder.addCase(fetchUserUserDataById.fulfilled, (state, action)=>{
+        builder.addCase(fetchUserUserDataById.fulfilled, (state, action) => {
             state.status = "finished"
             // @ts-ignore
-            state.data = action.payload
+            state.data = {
+                name: action.payload?.name? action.payload?.name:"",
+                about: action.payload?.about? action.payload?.about:"",
+                tag: action.payload?.tag? action.payload?.tag:"",
+            }
         })
 
 

@@ -11,12 +11,13 @@ type InputProps = {
     register: UseFormRegister<any>;
     className?: string;
     placeholder?: string
-    type?: string | 'text'
+    type?: string | 'text',
+    value?: string
 };
 
 
-const Input = ({label, register, className, placeholder, type}: InputProps) => (
-    <input type={type} className={s.root + " " + className} placeholder={placeholder} {...register(label)} />
+const Input = ({label, register, className, placeholder, type, value}: InputProps) => (
+    <input type={type} className={s.root + " " + className} value={value} placeholder={placeholder} {...register(label)} />
 );
 
 export default Input;

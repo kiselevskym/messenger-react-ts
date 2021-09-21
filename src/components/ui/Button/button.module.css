@@ -9,3 +9,8 @@
     border-radius: 10px;
     cursor: pointer;
 }
+
+.disabled{
+    background: silver;
+    cursor: not-allowed;
+}

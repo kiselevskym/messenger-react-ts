@@ -3,7 +3,18 @@ import Sidebar from "./Sidebar/Sidebar";
 import MainContent from "./MainContent/MainContent";
 import {useSelector} from "react-redux";
 import {selectCommunicationWith} from "../../../store/selectors/chatSelectors";
-import {collection, limitToLast, onSnapshot, orderBy, query, where, startAfter, getDocs} from "firebase/firestore";
+import {
+    collection,
+    limitToLast,
+    onSnapshot,
+    orderBy,
+    query,
+    where,
+    endBefore,
+    startAfter,
+    getDocs,
+    limit
+} from "firebase/firestore";
 import usersAPI, {generateId} from "../../../api/usersAPI";
 import {selectUid} from "../../../store/selectors/authSelectors";
 import {db} from "../../../firebase/firebase";
@@ -30,7 +41,10 @@ const Home = () => {
 
     const [messages, setMessages] = React.useState([])
     const [chats, setChats] = React.useState([])
-    const [isMessagesLoaded, setIsMessagesLoaded] = React.useState(false)
+    const [isMessagesLoaded, setIsMessagesLoaded] = React.useState(true)
+
+
+    const [lastVisible, setLastVisible] = React.useState(null)
 
     const uid = useSelector(selectUid)
     const communicationWith = useSelector(selectCommunicationWith)
@@ -47,7 +61,32 @@ const Home = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, [])
 
-    let lastVisible: any
+
+    const loader = async () => {
+        if(!uid || !communicationWith) return
+        if(lastVisible === undefined) return
+        const next = query(messagesRef, where("users", "==", generateId(uid, communicationWith)),
+            orderBy("timestamp"),
+            endBefore(lastVisible),
+            limitToLast(5));
+        const response = await getDocs(next)
+        const prevMessages: any = []
+        response.docs.forEach((doc)=>{
+            const data = doc.data()
+            const messageObject: MessageInterface = {
+                text: data.text,
+                timestamp: data.timestamp,
+                users: data.users,
+                sender: data.sender
+            }
+            prevMessages.push(messageObject);
+        })
+        // @ts-ignore
+        setMessages(messages=>[...prevMessages, ...messages])
+        // @ts-ignore
+        setLastVisible(response.docs[0]);
+    }
+
     useEffect(() => {
         if (!uid) return
         const q = query(collection(db, "conversations"), where("users", "array-contains-any", [uid]), orderBy("timestamp", "desc"))
@@ -58,8 +97,6 @@ const Home = () => {
                 const data = querySnapshotKey.data()
                 const userUID = querySnapshotKey.data().users[0] === uid ? data.users[1] : data.users[0]
                 const user = await usersAPI.getUserById(userUID)
-                lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
-
                 const chatObject: ChatInterface = {
                     lastText: data.lastText,
                     timestamp: data.timestamp,
@@ -67,27 +104,18 @@ const Home = () => {
                     chatUserName: user?.name,
                     chatUID: user?.uid
                 }
-
                 chats.push(chatObject);
             }
             setChats(chats)
-
-
         });
         return unsubscribe
     }, [])
 
-
-    // const loadMessages = () => {
-    //     const next = query(collection(db, "cities"),
-    //         orderBy("population"),
-    //         startAfter(lastVisible),
-    //         limit(25));
-    // }
-
+    const now = Date.now()
     useEffect(() => {
         if (!uid || !communicationWith) return
-        setIsMessagesLoaded(false)
+        setLastVisible(null)
+        setIsMessagesLoaded(true)
         const query1 = query(messagesRef, where("users", "==", generateId(uid, communicationWith)), orderBy("timestamp"), limitToLast(5))
 
         const messages: any = []
@@ -107,21 +135,30 @@ const Home = () => {
             })
             setMessages(messages)
             setIsMessagesLoaded(true)
+            // @ts-ignore
+            setLastVisible(response.docs[0]);
         }
 
         fetchMessages()
 
+    }, [communicationWith])
 
-        const q = query(messagesRef, where("users", "==", generateId(uid, communicationWith)), orderBy("timestamp", "asc"), limitToLast(5))
-        const unsubscribe = onSnapshot(q, {includeMetadataChanges: true}, (querySnapshot) => {
+    useEffect(()=>{
+        if(!uid || !communicationWith) return
+        const q = query(messagesRef, where("users", "==", generateId(uid, communicationWith)), where("timestamp", ">", now), orderBy("timestamp", "asc"))
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
 
-            querySnapshot.docChanges().forEach((change) => {
+            const messages1: any = []
+            querySnapshot.docChanges().forEach(async (change) => {
                 const data: any = change.doc.data()
 
 
                 if (change.type === "added") {
                     console.log("added")
                     console.log(data)
+                    // @ts-ignore
+                    setMessages([...messages, data])
+                    console.log((messages: any) => [...messages, data])
                 }
                 if (change.type === "modified") {
                     console.log("modified")
@@ -129,30 +166,15 @@ const Home = () => {
                 if (change.type === "removed") {
                     console.log("removed")
                 }
-                // const messageObject: MessageInterface = {
-                //     text: data.text,
-                //     timestamp: data.timestamp,
-                //     users: data.users,
-                //     sender: data.sender
-                // }
-                // messages.push(messageObject);
             });
-            //setMessages(messages)
 
         });
         return unsubscribe
-
-    }, [communicationWith])
-
-    useEffect(() => {
+    })
 
 
-    }, [])
 
 
-    const backup = () => {
-
-    }
 
     const messageItems = messages.map((item: MessageInterface, _) => (
         <MessageItem message={item.text} time={item.timestamp} key={item.timestamp} my={item.sender === uid}/>
@@ -169,7 +191,8 @@ const Home = () => {
 
     const MainContentProps = {
         isMessagesLoaded,
-        messages: messageItems
+        messages: messageItems,
+        func: loader,
     }
     const SidebarProps = {
         chats: chatItems
