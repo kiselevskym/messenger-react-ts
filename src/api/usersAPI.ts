@@ -7,16 +7,18 @@ import {
     collection,
     query,
     where,
-    limit,
-    orderBy,
-    onSnapshot
+    onSnapshot, getDocs
 } from "firebase/firestore";
+
 import {db} from "../firebase/firebase";
-import IUserData from "../shared/interfaces/IUserData";
+
+import {getDownloadURL, getStorage, ref, uploadBytes} from "firebase/storage";
+
 
 interface userProfileData {
     name: string
 }
+
 
 export const api = {
     fetchUserProfileData: async (id: string) => {
@@ -37,6 +39,20 @@ export const api = {
             name,
             uid,
         });
+    },
+    updateUserProfileData: async (uid: string, data: object & {
+        uid: string,
+        name: string,
+        about: string,
+        tag: string
+    }) => {
+        await setDoc(doc(getFirestore(), "users", `${uid}`), {
+            uid: data.uid,
+            name: data.name,
+            about: data.about,
+            tag: data.tag
+        })
+
     },
     sendMessage: (sender: string, receiver: string, message: string, username: string) => {
         const refMessages = collection(db, "messages")
@@ -73,10 +89,32 @@ export const api = {
             country: "USA"
         });
     },
-    getUserById: async (uid: string)=> {
+    getUserById: async (uid: string) => {
         const refUser = doc(db, "users", uid)
         const docSnap = await getDoc(refUser)
         return docSnap.data()
+    },
+    fetchProfileImageByUID: async (uid: string) => {
+        const imageRef = ref(getStorage(), `profile/${uid}.jpg`);
+        const url = await getDownloadURL(imageRef).then(url => {
+            return url
+        }).catch(error => {
+            return "https://t3.ftcdn.net/jpg/01/09/00/64/360_F_109006426_388PagqielgjFTAMgW59jRaDmPJvSBUL.jpg"
+        })
+        return url
+    },
+    uploadProfileImage: (uid: string, file: Blob) => {
+        const imageRef = ref(getStorage(), `profile/${uid}.jpg`);
+        uploadBytes(imageRef, file, {contentType: file.type})
+    },
+    fetchUserByName: async (name: string) => {
+        const q = query(collection(db, "users"), where("name", "==", name));
+        const contacts: any = []
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            contacts.push(doc.data())
+        });
+        return contacts
     }
 }
 

@@ -1,7 +1,5 @@
 import React from 'react';
 import s from './top-information.module.css'
-import {useDispatch} from "react-redux";
-import {setCommunicationWith} from "../../../../store/slices/chatSlice";
 import {GrFormPreviousLink} from "react-icons/gr"
 
 
@@ -11,8 +9,6 @@ interface TopInformationProps {
 }
 
 const TopInformation = ({uid, onCloseConversation}: TopInformationProps) => {
-
-
     return (
         <div className={s.root}>
             <div className={s.close} onClick={onCloseConversation}>

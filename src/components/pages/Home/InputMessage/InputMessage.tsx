@@ -30,13 +30,14 @@ const InputMessage = ({className, username}: InputMessageProps) => {
     const onPressEnter = (e: any) => {
 
         if (e.code === "Enter") {
-            if (uid !== undefined && communicationWith !== undefined) {
+            if (uid && communicationWith) {
                 usersAPI.sendMessage(uid, communicationWith, message, usernamet)
                 setMessage("")
 
             }
         }
     }
+
 
     const onChangeMessage = (e: any) => {
         setMessage(e.target.value)

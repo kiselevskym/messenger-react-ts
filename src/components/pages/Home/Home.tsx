@@ -11,9 +11,7 @@ import {
     query,
     where,
     endBefore,
-    startAfter,
     getDocs,
-    limit
 } from "firebase/firestore";
 import usersAPI, {generateId} from "../../../api/usersAPI";
 import {selectUid} from "../../../store/selectors/authSelectors";
@@ -24,6 +22,8 @@ import ChatItem from "./ChatItem/ChatItem";
 import default_profile_avatar_img from "../../../assets/img/default-user-image.png"
 import bookmark_img from "../../../assets/img/bookmark.png"
 import ChatInterface from "../../../shared/interfaces/ChatInterface";
+
+
 
 
 const MOBILE_WIDTH = 761
@@ -44,7 +44,7 @@ const Home = () => {
     const [isMessagesLoaded, setIsMessagesLoaded] = React.useState(true)
 
 
-    const [lastVisible, setLastVisible] = React.useState(null)
+    const [lastVisible, setLastVisible] = React.useState<any>(null)
 
     const uid = useSelector(selectUid)
     const communicationWith = useSelector(selectCommunicationWith)
@@ -68,7 +68,7 @@ const Home = () => {
         const next = query(messagesRef, where("users", "==", generateId(uid, communicationWith)),
             orderBy("timestamp"),
             endBefore(lastVisible),
-            limitToLast(5));
+            limitToLast(20));
         const response = await getDocs(next)
         const prevMessages: any = []
         response.docs.forEach((doc)=>{
@@ -83,7 +83,6 @@ const Home = () => {
         })
         // @ts-ignore
         setMessages(messages=>[...prevMessages, ...messages])
-        // @ts-ignore
         setLastVisible(response.docs[0]);
     }
 
@@ -97,12 +96,14 @@ const Home = () => {
                 const data = querySnapshotKey.data()
                 const userUID = querySnapshotKey.data().users[0] === uid ? data.users[1] : data.users[0]
                 const user = await usersAPI.getUserById(userUID)
+                const userPic = await usersAPI.fetchProfileImageByUID(userUID)
                 const chatObject: ChatInterface = {
                     lastText: data.lastText,
                     timestamp: data.timestamp,
                     lastSender: data.lastSender,
                     chatUserName: user?.name,
-                    chatUID: user?.uid
+                    chatUID: user?.uid,
+                    picture: userPic
                 }
                 chats.push(chatObject);
             }
@@ -115,8 +116,8 @@ const Home = () => {
     useEffect(() => {
         if (!uid || !communicationWith) return
         setLastVisible(null)
-        setIsMessagesLoaded(true)
-        const query1 = query(messagesRef, where("users", "==", generateId(uid, communicationWith)), orderBy("timestamp"), limitToLast(5))
+        setIsMessagesLoaded(false)
+        const query1 = query(messagesRef, where("users", "==", generateId(uid, communicationWith)), orderBy("timestamp"), limitToLast(20))
 
         const messages: any = []
 
@@ -135,7 +136,6 @@ const Home = () => {
             })
             setMessages(messages)
             setIsMessagesLoaded(true)
-            // @ts-ignore
             setLastVisible(response.docs[0]);
         }
 
@@ -145,36 +145,24 @@ const Home = () => {
 
     useEffect(()=>{
         if(!uid || !communicationWith) return
-        const q = query(messagesRef, where("users", "==", generateId(uid, communicationWith)), where("timestamp", ">", now), orderBy("timestamp", "asc"))
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
 
-            const messages1: any = []
+        const q = query(messagesRef, where("users", "==", generateId(uid, communicationWith)),
+            where("timestamp", ">", now),
+            orderBy("timestamp", "asc"))
+
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
             querySnapshot.docChanges().forEach(async (change) => {
                 const data: any = change.doc.data()
-
-
                 if (change.type === "added") {
-                    console.log("added")
-                    console.log(data)
                     // @ts-ignore
                     setMessages([...messages, data])
-                    console.log((messages: any) => [...messages, data])
                 }
-                if (change.type === "modified") {
-                    console.log("modified")
-                }
-                if (change.type === "removed") {
-                    console.log("removed")
-                }
+                if (change.type === "modified") {}
+                if (change.type === "removed") {}
             });
-
         });
         return unsubscribe
     })
-
-
-
-
 
     const messageItems = messages.map((item: MessageInterface, _) => (
         <MessageItem message={item.text} time={item.timestamp} key={item.timestamp} my={item.sender === uid}/>
@@ -182,10 +170,11 @@ const Home = () => {
 
     const chatItems = chats.map((item: ChatInterface, _) => {
         const username = item.chatUID === uid ? "Избранное" : item.chatUserName
-        const picUrl = item.chatUID === uid ? bookmark_img : default_profile_avatar_img
+
+        const pic = item.chatUID === uid ? bookmark_img : (item.picture?item.picture:default_profile_avatar_img)
         return <ChatItem uid={item.chatUID} key={item.timestamp} username={username}
-                         lastMessage={item.lastText} time={item.timestamp} picture={picUrl}
-                         lastSender={item.lastSender}/>
+                         lastMessage={item.lastText} time={item.timestamp} picture={pic}
+                         lastSender={item.lastSender} />
     })
 
 
@@ -193,6 +182,7 @@ const Home = () => {
         isMessagesLoaded,
         messages: messageItems,
         func: loader,
+        isMoreMessages: !!lastVisible
     }
     const SidebarProps = {
         chats: chatItems

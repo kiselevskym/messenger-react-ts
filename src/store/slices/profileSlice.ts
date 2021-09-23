@@ -9,13 +9,7 @@ export const fetchUserUserDataById = createAsyncThunk(
         return response
     }
 )
-// const fetchUserProfileDataById = createAsyncThunk(
-//     'users/fetchProfileDataById',
-//     async (userId: string) => {
-//         const response = await fetchUserProfileDataById(currentUser.userId)
-//         return (await response.json()) as Returned
-//     }
-// )
+
 
 interface stateProps {
     data: object & {

@@ -1,16 +1,18 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {authSlice} from "./authSlice";
+import default_image from "../../assets/img/default-user-image.png"
 
 
 interface Props {
     communicationWith: string | undefined
-    username: string | undefined,
-    isLoaded: boolean
+    username: string | null,
+    isLoaded: boolean,
+    picture: string
 }
 
 const initialState: Props = {
     communicationWith: undefined,
-    username: undefined,
+    username: null,
+    picture: default_image,
     isLoaded: false
 }
 
@@ -24,7 +26,7 @@ export const chatSlice = createSlice({
         setLoaded: (state, action: PayloadAction<boolean>) => {
             state.isLoaded = action.payload
         },
-        setUsername: (state, action: PayloadAction<string | undefined>) => {
+        setUsername: (state, action: PayloadAction<string | null>) => {
             state.username = action.payload
         }
     }

@@ -9,16 +9,15 @@ import {selectUid} from "../../../../store/selectors/authSelectors";
 import Loader from "../../../ui/Loader/Loader";
 import {setCommunicationWith} from "../../../../store/slices/chatSlice";
 
-import {useScroll} from "react-use";
-
 interface MainContentProps {
     messages:  JSX.Element[],
     isMessagesLoaded: boolean,
-    func: any
+    func: any,
+    isMoreMessages: boolean
 }
-const t = document.getElementById("scroll")
 
-const MainContent = ({messages, isMessagesLoaded, func}: MainContentProps) => {
+
+const MainContent = ({messages, isMessagesLoaded, func, isMoreMessages}: MainContentProps) => {
     const communicationWith = useSelector(selectCommunicationWith)
     const [username, setUsername] = React.useState("")
     const [isLoaded, setLoaded] = React.useState(false)
@@ -27,21 +26,15 @@ const MainContent = ({messages, isMessagesLoaded, func}: MainContentProps) => {
     const ref = React.useRef<HTMLDivElement>(null);
     const dispatch = useDispatch()
 
-    const onCloseConversation = () => {
-        setLoaded(false)
-        dispatch(setCommunicationWith(undefined))
-    }
+
     useEffect(() => {
         if (communicationWith) {
             setLoaded(false)
-
             if (communicationWith === uid) {
-
                 setUsername("Избранное")
                 setLoaded(true)
             } else {
                 usersAPI.getUserById(communicationWith).then((data: any) => {
-
                     setUsername(data.name)
                     setLoaded(true)
                 })
@@ -49,15 +42,16 @@ const MainContent = ({messages, isMessagesLoaded, func}: MainContentProps) => {
         }
     }, [communicationWith])
 
-
     useEffect(()=>{
         ref.current && ref.current.scrollTo(50,ref.current.scrollHeight)
     })
 
-    useEffect(()=>{
 
-    },[])
 
+    const onCloseConversation = () => {
+        setLoaded(false)
+        dispatch(setCommunicationWith(undefined))
+    }
 
     if (!communicationWith) {
         return (
@@ -67,22 +61,17 @@ const MainContent = ({messages, isMessagesLoaded, func}: MainContentProps) => {
                 </div>
             </div>)
     }
-
-
-
     if(!isLoaded || !isMessagesLoaded){
         return(<div className={s.root}>
             <Loader/>
         </div>)
     }
 
-    console.log("rerender")
     return (
         <div className={s.root} id={"main"}>
             <TopInformation uid={username} onCloseConversation={onCloseConversation}/>
             <div className={s.messagesContainer} ref={ref}>
-
-                <button onClick={func}>LOAD MORE MESSAGES</button>
+                {isMoreMessages?<div className={s.btnLoadMore} onClick={func}>Показать еще</div>:""}
                 <div className={s.chatWidth}>
                     {messages}
                 </div>

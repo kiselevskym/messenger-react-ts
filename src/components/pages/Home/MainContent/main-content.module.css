@@ -8,6 +8,12 @@
 
 }
 
+.btnLoadMore{
+    text-align: center;
+    background: #f0f0f0;
+    font-weight: bold;
+    cursor: pointer;
+}
 .messagesContainer {
 
     height: calc(100% - 100px);

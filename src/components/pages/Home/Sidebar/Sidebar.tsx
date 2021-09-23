@@ -1,10 +1,8 @@
-import React, {ChangeEvent, useEffect} from 'react';
+import React from 'react';
 import s from './sidebar.module.css'
-import {collection, query, where, getDocs} from "firebase/firestore";
-import {db} from "../../../../firebase/firebase";
 import {getAuth, signOut} from "firebase/auth"
 import ChatItem from "../ChatItem/ChatItem";
-import {useTransition, animated, config} from "react-spring";
+import {useTransition, animated} from "react-spring";
 import {RiBookmarkFill} from 'react-icons/ri'
 import {setCommunicationWith} from "../../../../store/slices/chatSlice";
 import {useDispatch, useSelector} from "react-redux";
@@ -15,8 +13,11 @@ import {GrFormPreviousLink} from "react-icons/gr";
 import Input from "../../Auth/Input/Input";
 import {useForm} from "react-hook-form";
 import UserDataInput from "../../../../shared/interfaces/UserDataInput";
-import {ImageUpload} from "../../../ui/ImageUpload/ImageUpload";
 import Button from "../../../ui/Button/Button";
+import usersAPI from "../../../../api/usersAPI";
+import {fetchUserUserDataById} from "../../../../store/slices/profileSlice";
+
+import default_user_image from "../../../../assets/img/default-user-image.png"
 
 interface SidebarProps {
     chats: JSX.Element[]
@@ -29,13 +30,22 @@ const Sidebar = ({chats}: SidebarProps) => {
     const [contacts, setContacts] = React.useState([])
     const [renderComponentName, setRenderComponentName] = React.useState<"default" | "settings">("default")
     const [isBtnDisabled, setIsBtnDisabled] = React.useState(true)
+    const [userProfileImage, setUserProfileImage] = React.useState<string | null>(null)
+    const [image, setImage] = React.useState<object & { file: null | Blob, dataUrl: null | string }>({
+        file: null,
+        dataUrl: null,
+    })
 
     const uid = useSelector(selectUid)
     const profile = useSelector(selectProfileState)
     const dispatch = useDispatch()
 
+    const {register, handleSubmit, watch, setValue, formState: {errors}} = useForm<UserDataInput>();
+    const watchAllFields = watch();
 
-    const transition = useTransition(showMenu, {
+    const file = React.useRef<HTMLInputElement | null>(null)
+
+    const transitionMenu = useTransition(showMenu, {
         from: {x: -300},
         enter: {x: 0},
         leave: {x: -300},
@@ -45,21 +55,13 @@ const Sidebar = ({chats}: SidebarProps) => {
     })
 
     async function fetchUsers() {
-        const q = query(collection(db, "users"), where("name", "==", input));
-
-        const contacts: any = []
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-            contacts.push(doc.data())
-        });
-        setContacts(contacts)
+        await usersAPI.fetchUserByName(input).then((data: any) => {
+            setContacts(data)
+        })
     }
 
     React.useEffect(() => {
-        if (input.length > 2) {
-            fetchUsers()
-        }
-
+        if (input.length >= 3) fetchUsers()
 
         if (input.length > 0) {
             setLookingForContacts(true)
@@ -68,68 +70,104 @@ const Sidebar = ({chats}: SidebarProps) => {
         }
     }, [input])
 
+    React.useEffect(() => {
+        if (!uid) return
+        const fetch = async () => {
+            const image = await usersAPI.fetchProfileImageByUID(uid)
+            setUserProfileImage(image)
+        }
+        fetch()
+    }, [])
 
-    const contactsItems = contacts.map((item: any, _) => (
-        <ChatItem uid={item.uid} username={item.name} lastMessage={"Тут ничего нет"} time={""} lastSender={""}
-                  picture={"https://t3.ftcdn.net/jpg/01/09/00/64/360_F_109006426_388PagqielgjFTAMgW59jRaDmPJvSBUL.jpg"}/>
-    ))
 
-    const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
-        setInput(e.target.value)
-    }
-    const onClickShowMenu = () => {
-        setShowMenu(true)
-    }
+    React.useEffect(() => {
+        setValue("name", profile.data.name)
+        setValue("bio", profile.data.about ? profile.data.about : "")
+        setValue("tag", profile.data.tag ? profile.data.tag : "")
+
+    }, [profile.data])
+
+    React.useEffect(() => {
+        if (watchAllFields.name !== profile.data.name || watchAllFields.bio !== profile.data.about || watchAllFields.tag !== profile.data.tag) {
+            setIsBtnDisabled(false)
+        } else {
+            setIsBtnDisabled(true)
+        }
+    }, [watchAllFields.name, watchAllFields.bio, watchAllFields.tag, profile.data])
+
+
+    const onInputSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)
+
+    const onShowMenuClick = () => setShowMenu(true)
+
+    // it opens saved messages
     const onBookmarkClick = () => {
         dispatch(setCommunicationWith(uid))
         setShowMenu(false)
     }
-    const onSignOutClick = () => {
-        signOut(getAuth())
-    }
-    const onClickCloseMenu = (e: any) => {
+
+    const onSignOutClick = () => signOut(getAuth())
+
+
+    // if user clicks on the black background
+    const onCloseMenuClick = (e: any) => {
         if (e.target.className === s.menu) {
             setShowMenu(false)
         }
     }
 
+    // it opens settings(edit profile) menu
     const onSettingsClick = () => {
         setShowMenu(false)
         setRenderComponentName("settings")
     }
 
-    const onTEST = () => {
+    const onDefaultClick = () => setRenderComponentName("default")
+
+    const onEditProfileInformationClick = () => {
+        if (!uid) return
+        usersAPI.updateUserProfileData(uid, {
+            uid: uid,
+            name: watchAllFields.name,
+            about: watchAllFields.bio,
+            tag: watchAllFields.tag
+        })
+        dispatch(fetchUserUserDataById(uid))
         setRenderComponentName("default")
     }
 
 
-    const {register, handleSubmit, watch, setValue , formState: {errors}} = useForm<UserDataInput>();
-    const watchAllFields = watch();
-    const onSubmit = (data: any) => console.log(data);
-    useEffect(() => {
-        setValue("name", profile.data.name)
-        setValue("bio", profile.data.about?profile.data.about:"")
-        setValue("tag", profile.data.tag?profile.data.tag:"")
+    const onUploadProfileImageClick = () => {
+        if (!image.file || !uid) return
+        usersAPI.uploadProfileImage(uid, image.file)
+    }
+    const onEditProfileImageChange = (data: any) => {
+        const dataUrl = URL.createObjectURL(data.target.files[0])
+        // @ts-ignore
+        setImage({
+            file: data.target.files[0],
+            dataUrl
+        })
+    }
+    const onRedirectionToInputFileClick = () => {
+        file.current?.click()
+    }
 
-    }, [profile.data])
 
-    useEffect(() => {
-        if(watchAllFields.name !== profile.data.name||watchAllFields.bio !== profile.data.about||watchAllFields.tag !== profile.data.tag){
-            setIsBtnDisabled(false)
-        }else{
-            setIsBtnDisabled(true)
-        }
-        console.log(profile.data)
-        console.log(watchAllFields)
-    }, [watchAllFields.name, watchAllFields.bio, watchAllFields.tag])
+    const contactsItems = contacts.map((item: any, _) => (
+        <ChatItem uid={item.uid} username={item.name} lastMessage={"Тут ничего нет"} time={""} lastSender={""}
+                  picture={default_user_image}/>
+    ))
 
+    const userProfileImageOrDefault = userProfileImage ? userProfileImage : default_user_image
+    const profilePicture = image?.dataUrl ? image.dataUrl : userProfileImageOrDefault
 
     let render
     if (renderComponentName === "settings") {
         render = (
             <div className={s.settings}>
                 <div className={s.settingsTop}>
-                    <div className={s.settingsTopPrev} onClick={onTEST}>
+                    <div className={s.settingsTopPrev} onClick={onDefaultClick}>
                         <GrFormPreviousLink size={"30"}/>
                     </div>
                     <div className={s.settingsTopText}>
@@ -138,9 +176,15 @@ const Sidebar = ({chats}: SidebarProps) => {
                 </div>
 
                 <div className={s.settingsMain}>
-                    <ImageUpload/>
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <Input type={'text'}  className={s.settings__input} placeholder={"Имя"} label={"name"}
+                    <div className={s.imageUpload}>
+                        <img onClick={onRedirectionToInputFileClick} src={profilePicture}
+                             alt=""/>
+                        <Button onClick={onUploadProfileImageClick} disabled={!image.file}>Загрузить</Button>
+                        <input onChange={onEditProfileImageChange} type="file" ref={file}/>
+                    </div>
+
+                    <form onSubmit={handleSubmit(onEditProfileInformationClick)}>
+                        <Input type={'text'} className={s.settings__input} placeholder={"Имя"} label={"name"}
                                register={register}/>
                         <Input type={'text'} className={s.settings__input} placeholder={"О себе"} label={"bio"}
                                register={register}/>
@@ -150,38 +194,32 @@ const Sidebar = ({chats}: SidebarProps) => {
                             Вы можете выбрать тег в Месседжере. Если вы это сделаете, люди смогут найти вас по
                             этому тегу и связаться с вами, не требуя вашей электронной почты.
                         </span>
-
                         <Button disabled={isBtnDisabled} className={s.settingsBtn}>Изменить</Button>
                     </form>
                 </div>
-
-
             </div>)
     } else if (renderComponentName === "default") {
         render = (
             <>
                 <nav role="navigation" className={s.nav}>
-                    <div className={s.menuButton} onClick={onClickShowMenu}>
+                    <div className={s.menuButton} onClick={onShowMenuClick}>
                         <div></div>
                         <div></div>
                         <div></div>
                     </div>
-                    <input value={input} onChange={onChangeInput} placeholder={"Поиск"} className={s.input}/>
+                    <input value={input} onChange={onInputSearchChange} placeholder={"Поиск"} className={s.input}/>
                 </nav>
                 <div className={s.chats}>
                     {!lookingForContacts ? chats.length ? chats : new Array(8).fill("_").map((item, id) =>
-                        <ChatItemLoader key={id}/>) : contactsItems}
-
+                        <ChatItemLoader key={id}/>) : (contactsItems.length?contactsItems:<div className={s.searchContactsInfo}>Введите тег или емейл</div>)}
                 </div>
             </>
         )
     }
-
-
     return (
         <>
-            {transition((style, item) => (
-                item && <div className={s.menu} onClick={(e) => onClickCloseMenu(e)}>
+            {transitionMenu((style, item) => (
+                item && <div className={s.menu} onClick={(e) => onCloseMenuClick(e)}>
                     <animated.ul style={style}>
                         <div className={s.profile}>
                             <div className={s.profileImg}>
@@ -206,7 +244,6 @@ const Sidebar = ({chats}: SidebarProps) => {
             </div>
         </>
     );
-
 };
 
 export default Sidebar;

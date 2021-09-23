@@ -162,7 +162,9 @@
     padding: 0 15px;
 }
 .settingsMain{
+
     margin-top: 40px;
+
 }
 .settings__input{
     margin-top: 25px;
@@ -177,9 +179,38 @@
     letter-spacing: -.1px;
     line-height: 0px;
 }
+
+
+.imageUpload{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+}
+.imageUpload button{
+    margin-top: 20px;
+    width: 150px;
+
+}
+.imageUpload img{
+    width: 200px;
+    height: 200px;
+    border-radius: 100%;
+    cursor: pointer;
+    -webkit-box-shadow: 0px 0px 42px -23px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 0px 0px 42px -23px rgba(34, 60, 80, 0.2);
+    box-shadow: 0px 0px 42px -23px rgba(34, 60, 80, 0.2);
+}
+.imageUpload input{
+    display: none;
+}
 @media screen and (max-width: 761px) {
     .root{
         width: 100vw !important;
 
     }
+}
+
+.searchContactsInfo{
+    text-align: center;
 }

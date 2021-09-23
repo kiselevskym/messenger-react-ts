@@ -4,7 +4,8 @@ interface ChatInterface {
     lastSender: string,
     timestamp: string,
     chatUserName: string,
-    chatUID: string
+    chatUID: string,
+    picture: any
 }
 
 export default ChatInterface

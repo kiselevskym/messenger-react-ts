@@ -1,7 +1,8 @@
 import React from 'react';
 import s from './chat-item.module.css'
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {setCommunicationWith} from "../../../../store/slices/chatSlice";
+import {selectUid} from "../../../../store/selectors/authSelectors";
 
 
 interface ChatItemProps {
@@ -14,6 +15,7 @@ interface ChatItemProps {
 }
 
 const ChatItem = ({username,lastMessage,time, uid, picture, lastSender}: ChatItemProps) => {
+    const myUID = useSelector(selectUid)
     const dispatch = useDispatch()
     const onChatItemClick = () => {
         dispatch(setCommunicationWith(uid))
@@ -32,7 +34,6 @@ const ChatItem = ({username,lastMessage,time, uid, picture, lastSender}: ChatIte
         return date
     }
 
-
     return (
         <div className={s.root} onClick={onChatItemClick}>
             <div className={s.avatar}>
@@ -42,7 +43,7 @@ const ChatItem = ({username,lastMessage,time, uid, picture, lastSender}: ChatIte
                 <div className={s.userNickname}>
                     {username}
                 </div>
-                <div className={s.userLastMessage}>{lastSender+": "} {lastMessage}</div>
+                <div className={s.userLastMessage}>{lastSender?lastSender+": ":""} {lastMessage}</div>
             </div>
             <div className={s.userLastMessageTime}>{date()}</div>
         </div>
