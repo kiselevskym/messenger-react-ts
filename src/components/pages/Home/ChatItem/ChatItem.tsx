@@ -1,7 +1,7 @@
 import React from 'react';
 import s from './chat-item.module.css'
 import {useDispatch, useSelector} from "react-redux";
-import {setCommunicationWith} from "../../../../store/slices/chatSlice";
+import {setCommunicationWith, setPicture} from "../../../../store/slices/chatSlice";
 import {selectUid} from "../../../../store/selectors/authSelectors";
 
 
@@ -15,10 +15,10 @@ interface ChatItemProps {
 }
 
 const ChatItem = ({username,lastMessage,time, uid, picture, lastSender}: ChatItemProps) => {
-    const myUID = useSelector(selectUid)
     const dispatch = useDispatch()
     const onChatItemClick = () => {
         dispatch(setCommunicationWith(uid))
+        dispatch(setPicture(picture))
     }
 
     const date = () => {

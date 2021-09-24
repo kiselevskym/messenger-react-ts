@@ -28,10 +28,13 @@ export const chatSlice = createSlice({
         },
         setUsername: (state, action: PayloadAction<string | null>) => {
             state.username = action.payload
+        },
+        setPicture: (state, action: PayloadAction<string>) => {
+            state.picture = action.payload
         }
     }
 })
 
-export const {setCommunicationWith} = chatSlice.actions
+export const {setCommunicationWith, setPicture} = chatSlice.actions
 
 export default chatSlice.reducer

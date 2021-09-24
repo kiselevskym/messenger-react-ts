@@ -69,7 +69,7 @@ const MainContent = ({messages, isMessagesLoaded, func, isMoreMessages}: MainCon
 
     return (
         <div className={s.root} id={"main"}>
-            <TopInformation uid={username} onCloseConversation={onCloseConversation}/>
+            <TopInformation username={username} onCloseConversation={onCloseConversation}/>
             <div className={s.messagesContainer} ref={ref}>
                 {isMoreMessages?<div className={s.btnLoadMore} onClick={func}>Показать еще</div>:""}
                 <div className={s.chatWidth}>

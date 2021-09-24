@@ -1,25 +1,29 @@
 import React from 'react';
 import s from './top-information.module.css'
 import {GrFormPreviousLink} from "react-icons/gr"
+import {useSelector} from "react-redux";
+import {selectChatPicture} from "../../../../store/selectors/chatSelectors";
 
 
 interface TopInformationProps {
-    uid: string,
+    username: string,
     onCloseConversation: any
 }
 
-const TopInformation = ({uid, onCloseConversation}: TopInformationProps) => {
+
+const TopInformation = ({username, onCloseConversation}: TopInformationProps) => {
+    const picture = useSelector(selectChatPicture)
     return (
         <div className={s.root}>
             <div className={s.close} onClick={onCloseConversation}>
                 <GrFormPreviousLink size={"25"}/>
             </div>
             <div className={s.avatar}>
-                <img src="https://t3.ftcdn.net/jpg/01/09/00/64/360_F_109006426_388PagqielgjFTAMgW59jRaDmPJvSBUL.jpg" alt="avatar"/>
+                <img src={picture} alt="avatar"/>
             </div>
             <div className={s.userInfo}>
-                <div className={s.userNickname}>{uid}</div>
-                {uid === "Избранное" ? "": <div className={s.userLastSeen}>last seen</div>}
+                <div className={s.userNickname}>{username}</div>
+                {username === "Избранное" ? "": <div className={s.userLastSeen}>last seen</div>}
             </div>
         </div>
     );

@@ -45,6 +45,7 @@ const Home = () => {
 
 
     const [lastVisible, setLastVisible] = React.useState<any>(null)
+    const [isThereAreMessages, setIsThereAreMessages] = React.useState<any>(null)
 
     const uid = useSelector(selectUid)
     const communicationWith = useSelector(selectCommunicationWith)
@@ -56,21 +57,31 @@ const Home = () => {
         function handleResize() {
             setWindowDimensions(getWindowDimensions());
         }
-
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, [])
 
 
+    const checkIfThereAreMoreMessages = async () => {
+        if(!uid || !communicationWith) return
+        const next = query(messagesRef, where("users", "==", generateId(uid, communicationWith)),
+            orderBy("timestamp"),
+            endBefore(lastVisible),
+            limitToLast(20));
+        const response = await getDocs(next)
+        setIsThereAreMessages(response.docs[0])
+    }
+
     const loader = async () => {
         if(!uid || !communicationWith) return
-        if(lastVisible === undefined) return
+        if(!lastVisible) return
         const next = query(messagesRef, where("users", "==", generateId(uid, communicationWith)),
             orderBy("timestamp"),
             endBefore(lastVisible),
             limitToLast(20));
         const response = await getDocs(next)
         const prevMessages: any = []
+
         response.docs.forEach((doc)=>{
             const data = doc.data()
             const messageObject: MessageInterface = {
@@ -117,13 +128,22 @@ const Home = () => {
         if (!uid || !communicationWith) return
         setLastVisible(null)
         setIsMessagesLoaded(false)
-        const query1 = query(messagesRef, where("users", "==", generateId(uid, communicationWith)), orderBy("timestamp"), limitToLast(20))
+        const query1 = query(messagesRef,
+            where("users", "==", generateId(uid, communicationWith)),
+            orderBy("timestamp"),
+            limitToLast(20))
 
         const messages: any = []
 
         async function fetchMessages() {
             const response = await getDocs(query1)
-            console.log(response.docs)
+            if(response.empty){
+                console.log("empty")
+            }else{
+                console.log("it is not empty")
+            }
+
+
             response.docs.forEach(doc => {
                 const data = doc.data()
                 const messageObject: MessageInterface = {
@@ -164,6 +184,10 @@ const Home = () => {
         return unsubscribe
     })
 
+    useEffect(()=>{
+        checkIfThereAreMoreMessages()
+    },[lastVisible])
+
     const messageItems = messages.map((item: MessageInterface, _) => (
         <MessageItem message={item.text} time={item.timestamp} key={item.timestamp} my={item.sender === uid}/>
     ))
@@ -182,7 +206,7 @@ const Home = () => {
         isMessagesLoaded,
         messages: messageItems,
         func: loader,
-        isMoreMessages: !!lastVisible
+        isMoreMessages: isThereAreMessages
     }
     const SidebarProps = {
         chats: chatItems

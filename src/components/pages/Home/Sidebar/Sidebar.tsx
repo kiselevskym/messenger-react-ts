@@ -30,6 +30,7 @@ const Sidebar = ({chats}: SidebarProps) => {
     const [contacts, setContacts] = React.useState([])
     const [renderComponentName, setRenderComponentName] = React.useState<"default" | "settings">("default")
     const [isBtnDisabled, setIsBtnDisabled] = React.useState(true)
+    const [isBtnChangePictureDisabled, setIsBtnChangePictureDisabled] = React.useState(true)
     const [userProfileImage, setUserProfileImage] = React.useState<string | null>(null)
     const [image, setImage] = React.useState<object & { file: null | Blob, dataUrl: null | string }>({
         file: null,
@@ -60,6 +61,12 @@ const Sidebar = ({chats}: SidebarProps) => {
         })
     }
 
+    const fetchProfileImage = async () => {
+        if (!uid) return
+        const image = await usersAPI.fetchProfileImageByUID(uid)
+        setUserProfileImage(image)
+    }
+
     React.useEffect(() => {
         if (input.length >= 3) fetchUsers()
 
@@ -70,13 +77,9 @@ const Sidebar = ({chats}: SidebarProps) => {
         }
     }, [input])
 
+
     React.useEffect(() => {
-        if (!uid) return
-        const fetch = async () => {
-            const image = await usersAPI.fetchProfileImageByUID(uid)
-            setUserProfileImage(image)
-        }
-        fetch()
+        fetchProfileImage()
     }, [])
 
 
@@ -140,6 +143,7 @@ const Sidebar = ({chats}: SidebarProps) => {
     const onUploadProfileImageClick = () => {
         if (!image.file || !uid) return
         usersAPI.uploadProfileImage(uid, image.file)
+        setIsBtnChangePictureDisabled(true)
     }
     const onEditProfileImageChange = (data: any) => {
         const dataUrl = URL.createObjectURL(data.target.files[0])
@@ -148,6 +152,8 @@ const Sidebar = ({chats}: SidebarProps) => {
             file: data.target.files[0],
             dataUrl
         })
+        setIsBtnChangePictureDisabled(false)
+
     }
     const onRedirectionToInputFileClick = () => {
         file.current?.click()
@@ -179,7 +185,7 @@ const Sidebar = ({chats}: SidebarProps) => {
                     <div className={s.imageUpload}>
                         <img onClick={onRedirectionToInputFileClick} src={profilePicture}
                              alt=""/>
-                        <Button onClick={onUploadProfileImageClick} disabled={!image.file}>Загрузить</Button>
+                        <Button onClick={onUploadProfileImageClick} disabled={isBtnChangePictureDisabled}>Загрузить</Button>
                         <input onChange={onEditProfileImageChange} type="file" ref={file}/>
                     </div>
 
