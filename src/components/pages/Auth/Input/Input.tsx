@@ -1,9 +1,7 @@
 import React from 'react';
 import {Path, UseFormRegister} from "react-hook-form";
-
 import s from "./input.module.css"
-import {AuthInput} from "../../../../shared/interfaces/AuthInput";
-import UserDataInput from "../../../../shared/interfaces/UserDataInput";
+
 
 
 type InputProps = {

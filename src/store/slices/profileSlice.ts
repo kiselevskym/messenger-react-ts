@@ -1,4 +1,4 @@
-import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import usersAPI from "../../api/usersAPI";
 import default_profile from "../../assets/img/default-user-image.png"
 

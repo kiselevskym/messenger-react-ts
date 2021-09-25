@@ -2,8 +2,6 @@ import React from 'react';
 import s from './chat-item.module.css'
 import {useDispatch, useSelector} from "react-redux";
 import {setCommunicationWith, setPicture} from "../../../../store/slices/chatSlice";
-import {selectUid} from "../../../../store/selectors/authSelectors";
-
 
 interface ChatItemProps {
     uid: string

@@ -58,7 +58,7 @@ const Home = () => {
     useEffect(()=>{
         uid && dispatch(fetchUserDataById(uid))
         uid && dispatch(fetchUserProfileImage(uid))
-    },[])
+    },[uid])
 
     useEffect(() => {
         function handleResize() {
@@ -72,7 +72,7 @@ const Home = () => {
     const checkIfThereAreMoreMessages = async () => {
         if(!uid || !communicationWith) return
         const next = query(messagesRef, where("users", "==", generateId(uid, communicationWith)),
-            orderBy("timestamp"),
+            orderBy("timestamp", "asc"),
             endBefore(lastVisible),
             limitToLast(20));
         const response = await getDocs(next)
@@ -83,7 +83,7 @@ const Home = () => {
         if(!uid || !communicationWith) return
         if(!lastVisible) return
         const next = query(messagesRef, where("users", "==", generateId(uid, communicationWith)),
-            orderBy("timestamp"),
+            orderBy("timestamp", "asc"),
             endBefore(lastVisible),
             limitToLast(20));
         const response = await getDocs(next)
@@ -137,18 +137,14 @@ const Home = () => {
         setIsMessagesLoaded(false)
         const query1 = query(messagesRef,
             where("users", "==", generateId(uid, communicationWith)),
-            orderBy("timestamp"),
+            orderBy("timestamp", "asc"),
             limitToLast(20))
 
         const messages: any = []
 
         async function fetchMessages() {
             const response = await getDocs(query1)
-            if(response.empty){
-                console.log("empty")
-            }else{
-                console.log("it is not empty")
-            }
+
 
 
             response.docs.forEach(doc => {

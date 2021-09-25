@@ -11,7 +11,6 @@ import {loadingIsEnded, loadingIsStated, setCurrentUser} from "./store/slices/au
 import UserDetails from "./components/pages/Auth/UserDetails/UserDetails";
 import {doc, getDoc, getFirestore} from "firebase/firestore";
 import {selectAuthIsLoaded, selectIsAuth, selectUid} from "./store/selectors/authSelectors";
-import usersAPI from "./api/usersAPI";
 import Loader from "./components/ui/Loader/Loader";
 
 
@@ -40,7 +39,7 @@ function App() {
 
 
 
-    }, [uid])
+    }, [uid, dispatch])
 
 
 

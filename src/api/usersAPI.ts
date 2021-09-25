@@ -7,7 +7,7 @@ import {
     collection,
     query,
     where,
-    onSnapshot, getDocs
+    getDocs
 } from "firebase/firestore";
 
 import {db} from "../firebase/firebase";

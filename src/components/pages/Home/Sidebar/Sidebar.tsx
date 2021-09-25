@@ -44,7 +44,7 @@ const Sidebar = ({chats}: SidebarProps) => {
     const profileImage = useSelector(selectProfileImage)
     const dispatch = useDispatch()
 
-    const {register, handleSubmit, watch, setValue, formState: {errors}} = useForm<UserDataInput>();
+    const {register, handleSubmit, watch, setValue} = useForm<UserDataInput>();
     const watchAllFields = watch();
 
     const file = React.useRef<HTMLInputElement | null>(null)
