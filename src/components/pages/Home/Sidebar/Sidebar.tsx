@@ -8,16 +8,18 @@ import {setCommunicationWith} from "../../../../store/slices/chatSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {selectUid} from "../../../../store/selectors/authSelectors";
 import ChatItemLoader from "../ChatItem/ChatItemLoader";
-import {selectProfileState} from "../../../../store/selectors/profileSelectors";
+import {selectProfileImage, selectProfileState} from "../../../../store/selectors/profileSelectors";
 import {GrFormPreviousLink} from "react-icons/gr";
 import Input from "../../Auth/Input/Input";
 import {useForm} from "react-hook-form";
 import UserDataInput from "../../../../shared/interfaces/UserDataInput";
 import Button from "../../../ui/Button/Button";
 import usersAPI from "../../../../api/usersAPI";
-import {fetchUserUserDataById} from "../../../../store/slices/profileSlice";
+import {setProfileStateImageURL} from "../../../../store/slices/profileSlice";
+
 
 import default_user_image from "../../../../assets/img/default-user-image.png"
+
 
 interface SidebarProps {
     chats: JSX.Element[]
@@ -39,6 +41,7 @@ const Sidebar = ({chats}: SidebarProps) => {
 
     const uid = useSelector(selectUid)
     const profile = useSelector(selectProfileState)
+    const profileImage = useSelector(selectProfileImage)
     const dispatch = useDispatch()
 
     const {register, handleSubmit, watch, setValue, formState: {errors}} = useForm<UserDataInput>();
@@ -80,6 +83,7 @@ const Sidebar = ({chats}: SidebarProps) => {
 
     React.useEffect(() => {
         fetchProfileImage()
+
     }, [])
 
 
@@ -135,7 +139,7 @@ const Sidebar = ({chats}: SidebarProps) => {
             about: watchAllFields.bio,
             tag: watchAllFields.tag
         })
-        dispatch(fetchUserUserDataById(uid))
+
         setRenderComponentName("default")
     }
 
@@ -143,6 +147,7 @@ const Sidebar = ({chats}: SidebarProps) => {
     const onUploadProfileImageClick = () => {
         if (!image.file || !uid) return
         usersAPI.uploadProfileImage(uid, image.file)
+        dispatch(setProfileStateImageURL(image.dataUrl))
         setIsBtnChangePictureDisabled(true)
     }
     const onEditProfileImageChange = (data: any) => {
@@ -152,6 +157,7 @@ const Sidebar = ({chats}: SidebarProps) => {
             file: data.target.files[0],
             dataUrl
         })
+
         setIsBtnChangePictureDisabled(false)
 
     }
@@ -183,7 +189,7 @@ const Sidebar = ({chats}: SidebarProps) => {
 
                 <div className={s.settingsMain}>
                     <div className={s.imageUpload}>
-                        <img onClick={onRedirectionToInputFileClick} src={profilePicture}
+                        <img onClick={onRedirectionToInputFileClick} src={image?.dataUrl? image.dataUrl :profilePicture}
                              alt=""/>
                         <Button onClick={onUploadProfileImageClick} disabled={isBtnChangePictureDisabled}>Загрузить</Button>
                         <input onChange={onEditProfileImageChange} type="file" ref={file}/>
@@ -230,7 +236,7 @@ const Sidebar = ({chats}: SidebarProps) => {
                         <div className={s.profile}>
                             <div className={s.profileImg}>
                                 <img
-                                    src="https://t3.ftcdn.net/jpg/01/09/00/64/360_F_109006426_388PagqielgjFTAMgW59jRaDmPJvSBUL.jpg"
+                                    src={profileImage}
                                     alt=""/>
                             </div>
                             <div className={s.profileUser}>

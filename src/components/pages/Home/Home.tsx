@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import Sidebar from "./Sidebar/Sidebar";
 import MainContent from "./MainContent/MainContent";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {selectCommunicationWith} from "../../../store/selectors/chatSelectors";
 import {
     collection,
@@ -22,6 +22,7 @@ import ChatItem from "./ChatItem/ChatItem";
 import default_profile_avatar_img from "../../../assets/img/default-user-image.png"
 import bookmark_img from "../../../assets/img/bookmark.png"
 import ChatInterface from "../../../shared/interfaces/ChatInterface";
+import {fetchUserDataById, fetchUserProfileImage} from "../../../store/slices/profileSlice";
 
 
 
@@ -51,7 +52,13 @@ const Home = () => {
     const communicationWith = useSelector(selectCommunicationWith)
 
     const messagesRef = collection(db, "messages")
+    const dispatch = useDispatch()
 
+
+    useEffect(()=>{
+        uid && dispatch(fetchUserDataById(uid))
+        uid && dispatch(fetchUserProfileImage(uid))
+    },[])
 
     useEffect(() => {
         function handleResize() {

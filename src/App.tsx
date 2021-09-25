@@ -13,7 +13,7 @@ import {doc, getDoc, getFirestore} from "firebase/firestore";
 import {selectAuthIsLoaded, selectIsAuth, selectUid} from "./store/selectors/authSelectors";
 import usersAPI from "./api/usersAPI";
 import Loader from "./components/ui/Loader/Loader";
-import {fetchUserUserDataById} from "./store/slices/profileSlice";
+
 
 
 
@@ -38,7 +38,7 @@ function App() {
         })
 
 
-        uid && dispatch(fetchUserUserDataById(uid))
+
 
     }, [uid])
 
