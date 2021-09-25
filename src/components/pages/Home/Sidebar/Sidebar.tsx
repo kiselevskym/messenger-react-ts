@@ -57,9 +57,16 @@ const Sidebar = ({chats}: SidebarProps) => {
         delay: 0,
         config: {duration: 150}
     })
+    const transitionSettings = useTransition(renderComponentName, {
+        from: {x: -300},
+        enter: {x: 0},
+        leave: {x: -300},
+        delay: 0,
+        config: {duration: 150}
+    })
 
     async function fetchUsers() {
-        await usersAPI.fetchUserByName(input).then((data: any) => {
+        await usersAPI.fetchUserBy("name",input).then((data: any) => {
             setContacts(data)
         })
     }
@@ -152,18 +159,15 @@ const Sidebar = ({chats}: SidebarProps) => {
     }
     const onEditProfileImageChange = (data: any) => {
         const dataUrl = URL.createObjectURL(data.target.files[0])
-        // @ts-ignore
         setImage({
             file: data.target.files[0],
             dataUrl
         })
-
         setIsBtnChangePictureDisabled(false)
+    }
 
-    }
-    const onRedirectionToInputFileClick = () => {
-        file.current?.click()
-    }
+    const onRedirectionToInputFileClick = () => file.current?.click()
+
 
 
     const contactsItems = contacts.map((item: any, _) => (
@@ -174,60 +178,68 @@ const Sidebar = ({chats}: SidebarProps) => {
     const userProfileImageOrDefault = userProfileImage ? userProfileImage : default_user_image
     const profilePicture = image?.dataUrl ? image.dataUrl : userProfileImageOrDefault
 
-    let render
-    if (renderComponentName === "settings") {
-        render = (
-            <div className={s.settings}>
-                <div className={s.settingsTop}>
-                    <div className={s.settingsTopPrev} onClick={onDefaultClick}>
-                        <GrFormPreviousLink size={"30"}/>
-                    </div>
-                    <div className={s.settingsTopText}>
-                        Настройки
-                    </div>
-                </div>
 
-                <div className={s.settingsMain}>
-                    <div className={s.imageUpload}>
-                        <img onClick={onRedirectionToInputFileClick} src={image?.dataUrl? image.dataUrl :profilePicture}
-                             alt=""/>
-                        <Button onClick={onUploadProfileImageClick} disabled={isBtnChangePictureDisabled}>Загрузить</Button>
-                        <input onChange={onEditProfileImageChange} type="file" ref={file}/>
-                    </div>
 
-                    <form onSubmit={handleSubmit(onEditProfileInformationClick)}>
-                        <Input type={'text'} className={s.settings__input} placeholder={"Имя"} label={"name"}
-                               register={register}/>
-                        <Input type={'text'} className={s.settings__input} placeholder={"О себе"} label={"bio"}
-                               register={register}/>
-                        <Input type={'text'} className={s.settings__input} placeholder={"Тег"} label={"tag"}
-                               register={register}/>
-                        <span className={s.settingsDescription}>
+    const SettingsComponent = () => {
+
+
+        return (<>
+            {transitionSettings((style, item) => (
+                item === "settings" && <animated.div className={s.settings} style={style}>
+                    <div className={s.settingsTop}>
+                        <div className={s.settingsTopPrev} onClick={onDefaultClick}>
+                            <GrFormPreviousLink size={"30"}/>
+                        </div>
+                        <div className={s.settingsTopText}>
+                            Настройки
+                        </div>
+                    </div>
+                    <div className={s.settingsMain}>
+                        <div className={s.imageUpload}>
+                            <img onClick={onRedirectionToInputFileClick}
+                                 src={image?.dataUrl ? image.dataUrl : profilePicture}
+                                 alt=""/>
+                            <Button onClick={onUploadProfileImageClick}
+                                    disabled={isBtnChangePictureDisabled}>Загрузить</Button>
+                            <input onChange={onEditProfileImageChange} type="file" ref={file}/>
+                        </div>
+
+                        <form onSubmit={handleSubmit(onEditProfileInformationClick)}>
+                            <Input type={'text'} className={s.settings__input} placeholder={"Имя"} label={"name"}
+                                   register={register}/>
+                            <Input type={'text'} className={s.settings__input} placeholder={"О себе"} label={"bio"}
+                                   register={register}/>
+                            <Input type={'text'} className={s.settings__input} placeholder={"Тег"} label={"tag"}
+                                   register={register}/>
+                            <span className={s.settingsDescription}>
                             Вы можете выбрать тег в Месседжере. Если вы это сделаете, люди смогут найти вас по
                             этому тегу и связаться с вами, не требуя вашей электронной почты.
                         </span>
-                        <Button disabled={isBtnDisabled} className={s.settingsBtn}>Изменить</Button>
-                    </form>
-                </div>
-            </div>)
-    } else if (renderComponentName === "default") {
-        render = (
-            <>
-                <nav role="navigation" className={s.nav}>
-                    <div className={s.menuButton} onClick={onShowMenuClick}>
-                        <div></div>
-                        <div></div>
-                        <div></div>
+                            <Button disabled={isBtnDisabled} className={s.settingsBtn}>Изменить</Button>
+                        </form>
                     </div>
-                    <input value={input} onChange={onInputSearchChange} placeholder={"Поиск"} className={s.input}/>
-                </nav>
-                <div className={s.chats}>
-                    {!lookingForContacts ? chats.length ? chats : new Array(8).fill("_").map((item, id) =>
-                        <ChatItemLoader key={id}/>) : (contactsItems.length?contactsItems:<div className={s.searchContactsInfo}>Введите тег или емейл</div>)}
-                </div>
-            </>
-        )
+                </animated.div>
+            ))}
+        </>)
     }
+    const DefaultComponent = () => (
+        <>
+            <nav role="navigation" className={s.nav}>
+                <div className={s.menuButton} onClick={onShowMenuClick}>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+                <input value={input} onChange={onInputSearchChange} placeholder={"Поиск"} className={s.input}/>
+            </nav>
+            <div className={s.chats}>
+                {!lookingForContacts ? chats.length ? chats : new Array(8).fill("_").map((item, id) =>
+                    <ChatItemLoader key={id}/>) : (contactsItems.length?contactsItems:<div className={s.searchContactsInfo}>Поиск можно совершить по имени пользователя</div>)}
+            </div>
+        </>
+    )
+
+
     return (
         <>
             {transitionMenu((style, item) => (
@@ -252,7 +264,8 @@ const Sidebar = ({chats}: SidebarProps) => {
                 </div>
             ))}
             <div className={s.root} id={"sidebar"}>
-                {render}
+                {renderComponentName==="default"&&<DefaultComponent/>}
+                {renderComponentName==="settings"&&<SettingsComponent/>}
             </div>
         </>
     );

@@ -72,16 +72,7 @@ export const api = {
         });
 
     },
-    fetchConversations: async (myId: string) => {
-        const refConversations = collection(db, "conversations")
-        const q = query(refConversations, where("users", "array-contains-any", [myId]))
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const messages: any = [];
-            return querySnapshot.forEach((doc) => {
-                messages.push(doc.data());
-            });
-        });
-    },
+
     addUser: async (uid: string) => {
         await setDoc(doc(getFirestore(), "users", `${uid}`), {
             name: "Los Angeles",
@@ -107,8 +98,8 @@ export const api = {
         const imageRef = ref(getStorage(), `profile/${uid}.jpg`);
         uploadBytes(imageRef, file, {contentType: file.type})
     },
-    fetchUserByName: async (name: string) => {
-        const q = query(collection(db, "users"), where("name", "==", name));
+    fetchUserBy: async (searchByField: string,name: string) => {
+        const q = query(collection(db, "users"), where(searchByField, "==", name));
         const contacts: any = []
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
