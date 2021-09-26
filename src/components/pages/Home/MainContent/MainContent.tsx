@@ -76,9 +76,7 @@ const MainContent = ({messages, isMessagesLoaded, func, isMoreMessages}: MainCon
                     {messages}
                 </div>
             </div>
-            <div className={s.chatWidth}>
-                <InputMessage username={username} className={""}/>
-            </div>
+            <InputMessage username={username} className={""}/>
         </div>
     );
 };

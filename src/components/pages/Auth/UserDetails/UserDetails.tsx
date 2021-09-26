@@ -52,12 +52,10 @@ const UserDetails = () => {
         <AuthWrapper title={"Дополнительная информация"} subtitle={"Укажите дополнительную информацию о себе чтобы продолжить."}>
             <form onSubmit={handleSubmit(onSubmitClick)}>
                 <Input className={s.root__input} label={"name"} placeholder={"Ваше имя"} register={register}/>
-                <Input className={s.root__input} label={"about"} placeholder={"О себе"} register={register}/>
                 <Button className={s.root__button}>
                     Зарегестрироваться
                 </Button>
                 <p>{errors.name?.message}</p>
-                <p>{errors.about?.message}</p>
             </form>
         </AuthWrapper>
     );

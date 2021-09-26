@@ -27,6 +27,7 @@ import {fetchUserDataById, fetchUserProfileImage} from "../../../store/slices/pr
 
 
 
+
 const MOBILE_WIDTH = 761
 
 function getWindowDimensions() {
@@ -51,6 +52,7 @@ const Home = () => {
     const uid = useSelector(selectUid)
     const communicationWith = useSelector(selectCommunicationWith)
 
+
     const messagesRef = collection(db, "messages")
     const dispatch = useDispatch()
 
@@ -70,7 +72,7 @@ const Home = () => {
 
 
     const checkIfThereAreMoreMessages = async () => {
-        if(!uid || !communicationWith) return
+        if(!uid || !communicationWith || lastVisible===undefined) return
         const next = query(messagesRef, where("users", "==", generateId(uid, communicationWith)),
             orderBy("timestamp", "asc"),
             endBefore(lastVisible),
@@ -130,22 +132,20 @@ const Home = () => {
         return unsubscribe
     }, [])
 
-    const now = Date.now()
+
     useEffect(() => {
         if (!uid || !communicationWith) return
         setLastVisible(null)
         setIsMessagesLoaded(false)
         const query1 = query(messagesRef,
             where("users", "==", generateId(uid, communicationWith)),
-            orderBy("timestamp", "asc"),
+            orderBy("timestamp"),
             limitToLast(20))
 
         const messages: any = []
 
         async function fetchMessages() {
             const response = await getDocs(query1)
-
-
 
             response.docs.forEach(doc => {
                 const data = doc.data()
@@ -168,17 +168,27 @@ const Home = () => {
 
     useEffect(()=>{
         if(!uid || !communicationWith) return
+        const now = Date.now()
 
         const q = query(messagesRef, where("users", "==", generateId(uid, communicationWith)),
             where("timestamp", ">", now),
-            orderBy("timestamp", "asc"))
+            orderBy("timestamp"))
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            querySnapshot.docChanges().forEach(async (change) => {
-                const data: any = change.doc.data()
+            let data: any
+            querySnapshot.docChanges().forEach((change) => {
+                data = change.doc.data()
+
                 if (change.type === "added") {
                     // @ts-ignore
-                    setMessages([...messages, data])
+                    if(messages.length>0 && data.timestamp!==messages[messages.length-1].timestamp){
+                        // @ts-ignore
+                        setMessages([...messages, data])
+                    }else if(messages.length===0){
+                        // @ts-ignore
+                        setMessages([...messages,data])
+                    }
+
                 }
                 if (change.type === "modified") {}
                 if (change.type === "removed") {}
@@ -192,7 +202,7 @@ const Home = () => {
     },[lastVisible])
 
     const messageItems = messages.map((item: MessageInterface, _) => (
-        <MessageItem message={item.text} time={item.timestamp} key={item.timestamp} my={item.sender === uid}/>
+        <MessageItem message={item.text} time={item.timestamp} key={_+item.timestamp} my={item.sender === uid}/>
     ))
 
     const chatItems = chats.map((item: ChatInterface, _) => {

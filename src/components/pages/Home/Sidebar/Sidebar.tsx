@@ -66,7 +66,8 @@ const Sidebar = ({chats}: SidebarProps) => {
     })
 
     async function fetchUsers() {
-        await usersAPI.fetchUserBy("name",input).then((data: any) => {
+        await usersAPI.fetchUserBy(input).then((data: any) => {
+
             setContacts(data)
         })
     }
@@ -78,14 +79,14 @@ const Sidebar = ({chats}: SidebarProps) => {
     }
 
     React.useEffect(() => {
-        if (input.length >= 3) fetchUsers()
+        if (lookingForContacts) fetchUsers()
 
         if (input.length > 0) {
             setLookingForContacts(true)
         } else {
             setLookingForContacts(false)
         }
-    }, [input])
+    }, [input,lookingForContacts])
 
 
     React.useEffect(() => {
@@ -179,11 +180,31 @@ const Sidebar = ({chats}: SidebarProps) => {
     const profilePicture = image?.dataUrl ? image.dataUrl : userProfileImageOrDefault
 
 
+    let render
+    if(renderComponentName==="default"){
+        render = (<>
+            <nav role="navigation" className={s.nav}>
+                <div className={s.menuButton} onClick={onShowMenuClick}>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+                <input value={input} onChange={onInputSearchChange} placeholder={"Поиск"} className={s.input}/>
+            </nav>
+            <div className={s.chats}>
+                {/*{!lookingForContacts ? chats.length ?*/}
+                {/*    chats :*/}
+                {/*    new Array(8).fill("_").map((item, id) =>*/}
+                {/*    <ChatItemLoader key={id}/>) :*/}
+                {/*    (contactsItems.length?contactsItems:*/}
+                {/*        <div className={s.searchContactsInfo}>Поиск можно совершить по имени пользователя</div>)}*/}
+                {lookingForContacts ? (contactsItems.length?contactsItems:<div className={s.searchContactsInfo}>Поиск можно совершить по имени пользователя</div>):
+                    (chats.length?chats:"Не загружено или пусто")}
 
-    const SettingsComponent = () => {
-
-
-        return (<>
+            </div>
+        </>)
+    }else if(renderComponentName==="settings"){
+        render = ((<>
             {transitionSettings((style, item) => (
                 item === "settings" && <animated.div className={s.settings} style={style}>
                     <div className={s.settingsTop}>
@@ -220,24 +241,9 @@ const Sidebar = ({chats}: SidebarProps) => {
                     </div>
                 </animated.div>
             ))}
-        </>)
+        </>))
     }
-    const DefaultComponent = () => (
-        <>
-            <nav role="navigation" className={s.nav}>
-                <div className={s.menuButton} onClick={onShowMenuClick}>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                </div>
-                <input value={input} onChange={onInputSearchChange} placeholder={"Поиск"} className={s.input}/>
-            </nav>
-            <div className={s.chats}>
-                {!lookingForContacts ? chats.length ? chats : new Array(8).fill("_").map((item, id) =>
-                    <ChatItemLoader key={id}/>) : (contactsItems.length?contactsItems:<div className={s.searchContactsInfo}>Поиск можно совершить по имени пользователя</div>)}
-            </div>
-        </>
-    )
+
 
 
     return (
@@ -264,8 +270,7 @@ const Sidebar = ({chats}: SidebarProps) => {
                 </div>
             ))}
             <div className={s.root} id={"sidebar"}>
-                {renderComponentName==="default"&&<DefaultComponent/>}
-                {renderComponentName==="settings"&&<SettingsComponent/>}
+                {render}
             </div>
         </>
     );

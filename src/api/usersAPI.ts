@@ -36,7 +36,7 @@ export const api = {
         if (uid === undefined) return
 
         await setDoc(doc(getFirestore(), "users", `${uid}`), {
-            name,
+            name: name.trim(),
             uid,
         });
     },
@@ -47,24 +47,24 @@ export const api = {
         tag: string
     }) => {
         await setDoc(doc(getFirestore(), "users", `${uid}`), {
-            uid: data.uid,
-            name: data.name,
-            about: data.about,
-            tag: data.tag
+            uid: data.uid.trim(),
+            name: data.name.trim(),
+            about: data.about.trim(),
+            tag: data.tag.trim()
         })
 
     },
-    sendMessage: (sender: string, receiver: string, message: string, username: string) => {
+    sendMessage: async (sender: string, receiver: string, message: string, username: string) => {
         const refMessages = collection(db, "messages")
 
-        addDoc(refMessages, {
+        await addDoc(refMessages, {
             sender,
             users: generateId(sender, receiver),
             timestamp: Date.now(),
             text: message
         })
 
-        setDoc(doc(db, "conversations", generateId(sender, receiver)), {
+        await setDoc(doc(db, "conversations", generateId(sender, receiver)), {
             users: [sender, receiver],
             timestamp: Date.now(),
             lastText: message,
@@ -98,10 +98,12 @@ export const api = {
         const imageRef = ref(getStorage(), `profile/${uid}.jpg`);
         uploadBytes(imageRef, file, {contentType: file.type})
     },
-    fetchUserBy: async (searchByField: string,name: string) => {
-        const q = query(collection(db, "users"), where(searchByField, "==", name));
+    fetchUserBy: async (name: string) => {
+
+        const q = query(collection(db, "users"), where("name", "==", name));
         const contacts: any = []
         const querySnapshot = await getDocs(q);
+
         querySnapshot.forEach((doc) => {
             contacts.push(doc.data())
         });
