@@ -41,9 +41,10 @@ function getWindowDimensions() {
 const Home = () => {
     const [windowDimensions, setWindowDimensions] = React.useState(getWindowDimensions());
 
-    const [messages, setMessages] = React.useState([])
+    const [messages, setMessages] = React.useState<any>([])
     const [chats, setChats] = React.useState([])
-    const [isMessagesLoaded, setIsMessagesLoaded] = React.useState(true)
+    const [isMessagesLoaded, setIsMessagesLoaded] = React.useState(false)
+    const [isChatsLoaded, setIsChatsLoaded] = React.useState(false)
 
 
     const [lastVisible, setLastVisible] = React.useState<any>(null)
@@ -108,6 +109,7 @@ const Home = () => {
 
     useEffect(() => {
         if (!uid) return
+        setIsChatsLoaded(false)
         const q = query(collection(db, "conversations"), where("users", "array-contains-any", [uid]), orderBy("timestamp", "desc"))
 
         const unsubscribe = onSnapshot(q, async (querySnapshot) => {
@@ -128,6 +130,7 @@ const Home = () => {
                 chats.push(chatObject);
             }
             setChats(chats)
+            setIsChatsLoaded(true)
         });
         return unsubscribe
     }, [])
@@ -157,7 +160,11 @@ const Home = () => {
                 }
                 messages.push(messageObject);
             })
-            setMessages(messages)
+            if(messages.length>0){
+                setMessages(messages)
+            }else{
+                setMessages([])
+            }
             setIsMessagesLoaded(true)
             setLastVisible(response.docs[0]);
         }
@@ -165,43 +172,35 @@ const Home = () => {
         fetchMessages()
 
     }, [communicationWith])
-
+    const now = Date.now()
     useEffect(()=>{
         if(!uid || !communicationWith) return
-        const now = Date.now()
+
 
         const q = query(messagesRef, where("users", "==", generateId(uid, communicationWith)),
-            where("timestamp", ">", now),
-            orderBy("timestamp"))
+            where("timestamp", ">", Date.now()))
+
+
 
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            let data: any
             querySnapshot.docChanges().forEach((change) => {
-                data = change.doc.data()
 
                 if (change.type === "added") {
-                    // @ts-ignore
-                    if(messages.length>0 && data.timestamp!==messages[messages.length-1].timestamp){
-                        // @ts-ignore
-                        setMessages([...messages, data])
-                    }else if(messages.length===0){
-                        // @ts-ignore
-                        setMessages([...messages,data])
-                    }
-
+                    const data = change.doc.data()
+                    setMessages([...messages, data])
                 }
                 if (change.type === "modified") {}
                 if (change.type === "removed") {}
             });
         });
-        return unsubscribe
+    return unsubscribe;
     })
 
     useEffect(()=>{
         checkIfThereAreMoreMessages()
     },[lastVisible])
 
-    const messageItems = messages.map((item: MessageInterface, _) => (
+    const messageItems = messages.map((item: MessageInterface, _:any) => (
         <MessageItem message={item.text} time={item.timestamp} key={_+item.timestamp} my={item.sender === uid}/>
     ))
 
@@ -222,8 +221,10 @@ const Home = () => {
         isMoreMessages: isThereAreMessages
     }
     const SidebarProps = {
+        isChatsLoaded,
         chats: chatItems
     }
+
     if (windowDimensions.width < MOBILE_WIDTH) {
         return (
             <div>

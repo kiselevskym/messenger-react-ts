@@ -22,10 +22,11 @@ import default_user_image from "../../../../assets/img/default-user-image.png"
 
 
 interface SidebarProps {
-    chats: JSX.Element[]
+    chats: JSX.Element[],
+    isChatsLoaded: boolean
 }
 
-const Sidebar = ({chats}: SidebarProps) => {
+const Sidebar = ({chats, isChatsLoaded}: SidebarProps) => {
     const [showMenu, setShowMenu] = React.useState(false);
     const [lookingForContacts, setLookingForContacts] = React.useState(false);
     const [input, setInput] = React.useState("")
@@ -199,7 +200,9 @@ const Sidebar = ({chats}: SidebarProps) => {
                 {/*    (contactsItems.length?contactsItems:*/}
                 {/*        <div className={s.searchContactsInfo}>Поиск можно совершить по имени пользователя</div>)}*/}
                 {lookingForContacts ? (contactsItems.length?contactsItems:<div className={s.searchContactsInfo}>Поиск можно совершить по имени пользователя</div>):
-                    (chats.length?chats:"Не загружено или пусто")}
+                    (chats.length?chats:(isChatsLoaded?"У вас нет переписок еще": new Array(8).fill("_").map((item, id) => (
+                        <ChatItemLoader key={id}/>
+                    ) )))}
 
             </div>
         </>)
