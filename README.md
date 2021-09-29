@@ -47,7 +47,7 @@ and\
     },
     queryScope: Collection
 }`
-and
+and\
 `
 {
     collection: "messages",
