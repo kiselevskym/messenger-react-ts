@@ -1,3 +1,5 @@
+Стек технологий: React, Redux, TypeScript и Firebase.
+
 
 (https://messenger-react-ts.web.app/)
 ## Back-end Setup
@@ -42,6 +44,16 @@ and\
     fields: {
         users: Ascending,
         timestamp: Descending,
+    },
+    queryScope: Collection
+}`
+and
+`
+{
+    collection: "messages",
+    fields: {
+        users: Ascending,
+        timestamp: Ascending,
     },
     queryScope: Collection
 }`
