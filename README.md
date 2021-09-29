@@ -58,5 +58,11 @@ and\
     queryScope: Collection
 }`
 
+\\
+
+`
+npm i\
+npm run start
+`
 
 
